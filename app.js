@@ -372,14 +372,14 @@ app.get('/getQueue', async (req, res) => {
 const multer1 = multer({
   storage: multer.MemoryStorage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // no larger than 5mb
+    fileSize: 15 * 1024 * 1024 // no larger than 5mb
   }
 });
 // [END multer]
 
 app.post(
   '/uploadImg',
-  multer1.single('image'),
+  multer1.single('pic'),
   sendUploadToGCS,
   (req, res, next) => {
     let data = req.body;
@@ -388,8 +388,17 @@ app.post(
     // in cloud storage.
     if (req.file && req.file.cloudStoragePublicUrl) {
       data.imageUrl = req.file.cloudStoragePublicUrl;
-      console.log("Image uploaded to bucket")
+      console.log("Image uploaded to bucket. url: " + data.imageUrl);
+    } else {
+      console.log("Image uploaded to bucket fail");
+      res.status(206).send({});
     }
+
+    // 20180709 Rico: 
+    // Add Zhanghe's Google Vision API call code 
+    // Input:   image url from bucket
+    // Output:  JSON response. Then pass to Rico's DB function
+    // ...
 
     // // Save the data to the database.
     // getModel().create(data, (err, savedData) => {
@@ -412,7 +421,7 @@ function sendUploadToGCS (req, res, next) {
     return next();
   }
 
-  const gcsname = Date.now() + req.file.originalname;
+  const gcsname = Date.now() + '_' + req.file.originalname;
   const file = bucket.file(gcsname);
 
   const stream = file.createWriteStream({
