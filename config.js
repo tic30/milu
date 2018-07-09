@@ -48,8 +48,12 @@ config.albumPageSize = 50;
 // The API end point to use. Do not change.
 config.apiEndpoint = 'https://photoslibrary.googleapis.com';
 
-config.CLOUD_BUCKET = "tim-ocrtest-bucket";
+//config.CLOUD_BUCKET = "tim-ocrtest-bucket";
 
-config.GCLOUD_PROJECT = "ocr-test-by-tim";
+//config.GCLOUD_PROJECT = "ocr-test-by-tim";
+
+config.CLOUD_BUCKET = "milu-resources";
+
+config.GCLOUD_PROJECT = "milu-209718";
 
 module.exports = config;

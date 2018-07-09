@@ -35,6 +35,8 @@ const fileStore = sessionFileStore(session);
 const server = http.Server(app);
 
 const Storage = require('@google-cloud/storage');
+const vision = require('@google-cloud/vision');
+
 
 const CLOUD_BUCKET = config.CLOUD_BUCKET;
 
@@ -42,6 +44,9 @@ const gcstorage = Storage({
   projectId: config.GCLOUD_PROJECT
 });
 const bucket = gcstorage.bucket(CLOUD_BUCKET);
+
+
+
 // Use the EJS template engine
 app.set('view engine', 'ejs');
 
@@ -389,16 +394,34 @@ app.post(
     if (req.file && req.file.cloudStoragePublicUrl) {
       data.imageUrl = req.file.cloudStoragePublicUrl;
       console.log("Image uploaded to bucket. url: " + data.imageUrl);
+
+
     } else {
       console.log("Image uploaded to bucket fail");
       res.status(206).send({});
     }
 
-    // 20180709 Rico: 
-    // Add Zhanghe's Google Vision API call code 
+
+    // 20180709 Rico:
+    // Add Zhanghe's Google Vision API call code
     // Input:   image url from bucket
     // Output:  JSON response. Then pass to Rico's DB function
     // ...
+
+    // Imports the Google Cloud client library
+    const client = new vision.ImageAnnotatorClient();
+    client
+        .textDetection(data.imageUrl)
+        .then(results => {
+            const detections = results[0].textAnnotations;
+            console.log('Text:');
+            detections.forEach(text => console.log(text));
+            res.status(200).send(detections);
+        })
+        .catch(err => {
+            console.error('ERROR:', err);
+        });
+
 
     // // Save the data to the database.
     // getModel().create(data, (err, savedData) => {
@@ -408,9 +431,12 @@ app.post(
     //   }
     //   res.redirect(`${req.baseUrl}/${savedData.id}`);
     // });
-    res.status(200).send({});
+    //res.status(200).send({});
   }
 );
+
+
+
 
 function getPublicUrl (filename) {
   return `https://storage.googleapis.com/${CLOUD_BUCKET}/${filename}`;
