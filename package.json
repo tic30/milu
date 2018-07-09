@@ -10,6 +10,9 @@
     "url": "https://github.com/googlesamples/google-photos.git"
   },
   "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "@google-cloud/pubsub": "0.13.2",
     "@google-cloud/storage": "1.2.1",

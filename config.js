@@ -17,14 +17,21 @@
 const config = {};
 
 // The OAuth client ID from the Google Developers console.
-config.oAuthClientID = '34545632361-hfqe7gc57lqa20o6s4glgjj11bb0k1fv.apps.googleusercontent.com';
+//config.oAuthClientID = '34545632361-hfqe7gc57lqa20o6s4glgjj11bb0k1fv.apps.googleusercontent.com';
+config.oAuthClientID = '710296511012-uk0jlmamk3bggfp655k61h9cecfcc9t9.apps.googleusercontent.com';
+
 
 // The OAuth client secret from the Google Developers console.
-config.oAuthclientSecret = 'S1uSswxmF1OYNQdKQ-LZG2Ya';
+//config.oAuthclientSecret = 'S1uSswxmF1OYNQdKQ-LZG2Ya';
+config.oAuthclientSecret = '6JXpHEG0VDfGSYuuDT-Bqopm';
+
 
 // The callback to use for OAuth requests. This is the URL where the app is
 // running. For testing and running it locally, use 127.0.0.1.
-config.oAuthCallbackUrl = 'http://127.0.0.1:8080/auth/google/callback';
+//config.oAuthCallbackUrl = 'http://127.0.0.1:8080/auth/google/callback';
+config.oAuthCallbackUrl = 'https://milu-209718.appspot.com/auth/google/callback';
+
+
 
 // The port where the app should listen for requests.
 config.port = 8080;
