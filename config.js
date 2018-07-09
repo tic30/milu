@@ -48,4 +48,8 @@ config.albumPageSize = 50;
 // The API end point to use. Do not change.
 config.apiEndpoint = 'https://photoslibrary.googleapis.com';
 
+config.CLOUD_BUCKET = "tim-ocrtest-bucket";
+
+config.GCLOUD_PROJECT = "ocr-test-by-tim";
+
 module.exports = config;

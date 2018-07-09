@@ -46,11 +46,11 @@
 						} -->
 					<div class="mdl-dialog__content">
 						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-							<input class="mdl-textfield__input" type="text" name="username" id="email"/>
+							<input class="mdl-textfield__input" type="text" name="username" id="email" />
 							<label class="mdl-textfield__label" for="email">Email address</label>
 						</div>
 						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-							<input class="mdl-textfield__input" type="password" name="password" id="password"/>
+							<input class="mdl-textfield__input" type="password" name="password" id="password" />
 							<label class="mdl-textfield__label" for="password">Password</label>
 						</div>
 						<button type="button" class="mdl-button close">Cancel</button>
@@ -59,6 +59,9 @@
 				</form>
 			</dialog>
 		</div>
+		<form name="uploadImgForm" method="POST" action="/uploadImg">		
+			<input class="mdl-textfield__input" type="file" id="imgInput" name="pic" accept="image/*" hidden>
+		</form>
 		<!-- <header class="demo-header mdl-layout__header--fixed-header mdl-color--primary mdl-color-text--white">
 			<div class="mdl-layout__header-row">
 			          <span class="mdl-layout-title">Photo Frame Sample</span>
@@ -98,15 +101,24 @@
 
 				var dialog = document.querySelector('dialog');
 				var showDialogButton = document.querySelector('#show-dialog');
-				if (! dialog.showModal) {
-				dialogPolyfill.registerDialog(dialog);
+				if (!dialog.showModal) {
+					dialogPolyfill.registerDialog(dialog);
 				}
-				showDialogButton.addEventListener('click', function() {
-				dialog.showModal();
+				showDialogButton.addEventListener('click', function () {
+					dialog.showModal();
 				});
-				dialog.querySelector('.close').addEventListener('click', function() {
-				dialog.close();
+				dialog.querySelector('.close').addEventListener('click', function () {
+					dialog.close();
 				});
+				
+				$('#uploadimg').on('click', function (e) {
+					$('#imgInput').click();
+				});
+
+				$('#imgInput').on("change", function(){ 
+					document.uploadImgForm.submit();
+				});
+
 			});
 		</script>
 </body>

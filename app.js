@@ -28,12 +28,20 @@ const session = require('express-session');
 const sessionFileStore = require('session-file-store');
 const uuid = require('uuid');
 const winston = require('winston');
+const multer = require('multer');
 
 const app = express();
 const fileStore = sessionFileStore(session);
 const server = http.Server(app);
 
+const Storage = require('@google-cloud/storage');
 
+const CLOUD_BUCKET = config.CLOUD_BUCKET;
+
+const gcstorage = Storage({
+  projectId: config.GCLOUD_PROJECT
+});
+const bucket = gcstorage.bucket(CLOUD_BUCKET);
 // Use the EJS template engine
 app.set('view engine', 'ejs');
 
@@ -356,6 +364,80 @@ app.get('/getQueue', async (req, res) => {
     res.status(200).send({});
   }
 });
+
+// Multer handles parsing multipart/form-data requests.
+// This instance is configured to store images in memory.
+// This makes it straightforward to upload to Cloud Storage.
+// [START multer]
+const multer1 = multer({
+  storage: multer.MemoryStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // no larger than 5mb
+  }
+});
+// [END multer]
+
+app.post(
+  '/uploadImg',
+  multer1.single('image'),
+  sendUploadToGCS,
+  (req, res, next) => {
+    let data = req.body;
+
+    // Was an image uploaded? If so, we'll use its public URL
+    // in cloud storage.
+    if (req.file && req.file.cloudStoragePublicUrl) {
+      data.imageUrl = req.file.cloudStoragePublicUrl;
+      console.log("Image uploaded to bucket")
+    }
+
+    // // Save the data to the database.
+    // getModel().create(data, (err, savedData) => {
+    //   if (err) {
+    //     next(err);
+    //     return;
+    //   }
+    //   res.redirect(`${req.baseUrl}/${savedData.id}`);
+    // });
+    res.status(200).send({});
+  }
+);
+
+function getPublicUrl (filename) {
+  return `https://storage.googleapis.com/${CLOUD_BUCKET}/${filename}`;
+}
+
+function sendUploadToGCS (req, res, next) {
+  if (!req.file) {
+    return next();
+  }
+
+  const gcsname = Date.now() + req.file.originalname;
+  const file = bucket.file(gcsname);
+
+  const stream = file.createWriteStream({
+    metadata: {
+      contentType: req.file.mimetype
+    },
+    resumable: false
+  });
+
+  stream.on('error', (err) => {
+    req.file.cloudStorageError = err;
+    next(err);
+  });
+
+  stream.on('finish', () => {
+    req.file.cloudStorageObject = gcsname;
+    file.makePublic().then(() => {
+      req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
+      next();
+    });
+  });
+
+  stream.end(req.file.buffer);
+}
+// [END process]
 
 
 
