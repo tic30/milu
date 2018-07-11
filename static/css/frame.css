@@ -83,6 +83,34 @@ pre {
   bottom: 50px;
 }
 
+.floating-button1 {
+  position: fixed;
+  right: 50px;
+  bottom: 120px;
+}
+
+.floating-button2 {
+  position: fixed;
+  right: 50px;
+  bottom: 330px;
+}
+
+.floating-button3 {
+  position: fixed;
+  right: 50px;
+  bottom: 190px;
+}
+
+.floating-button3searchbox {
+  position: fixed;
+  right: 50px;
+  bottom: 260px;
+  
+  /* border: 3px solid  lightcoral; */
+  /* height : 40px; */
+  /* padding-right; */
+}
+
 .fancybox-bg {
   opacity: 1 !important;
 }
@@ -213,6 +241,14 @@ p .gp-button {
   padding: 0;
   text-transform: capitalize
 }
+
+
+.mdl-button2 {
+  height: 40px;
+  padding: 0;
+  text-transform: capitalize
+}
+
 
 /*Fixing left padding on bottom row of navigation*/
 

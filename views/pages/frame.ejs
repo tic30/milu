@@ -1,22 +1,23 @@
 <% include ../partials/head %>
 <section class="sample-content">
 	<div>
-		<h2>Photo frame preview</h2>
-    	<p class="subhead mdl-color-text--grey-700">Welcome to the photo frame sample. Select an option above to load images from your Google Photos library.
-        	<br />Select a photo or use the "View in frame" button to start your photo frame experience!
+		<h2>Photo OCR Search Engine</h2>
+    	<p class="subhead mdl-color-text--grey-700">Welcome to the photo ocr search. Try input a word and then search.
     		</p>
 	</div>
-	<div>
+	<!-- Originally show filter -->
+	<!-- <div>
    	 	<p id="preview-description" style="display: none;">
         	<div class="snippet">
-				<span id="images-count">0</span> images loaded from
+				<span id="images-count">0</span> Key word
         		<pre id="images-source">-</pre>
 			</div>
     	</p>
-	</div>
+	</div> -->
 	<div id="images-container"></div>
 	<div id="images_empty" style="display:none">
-	 		<img src="/imgs/null-results.png">
+			 <!-- <img src="/imgs/null-results.png"> -->
+			 <img src="/imgs/back.png">
 	 		<p>No results, try searching again</p>
 	</div>
 </section>
@@ -25,14 +26,52 @@
 <div class="floating-button">
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" id="startSlideshow">
         <i class="material-icons">fullscreen</i>
-		<span class="float-btn-label">View in frame</span>
+		<span class="float-btn-label">Full View</span>
     </button>
 </div>
+
+
+
+<form id="filter">
+
+    <!-- Accent-colored raised button with ripple -->
+    	<div class="floating-button1">
+            <button  type="submit" name="button_1" value="Search" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                <i class="material-icons">search</i>
+				<span class="float-btn-label">Show All</span>
+            </button>
+        </div>
+
+</form>
+
+
+<form id="scan">
+	<div class="floating-button2">
+		<button  type="submit" name="button_2" value="Update" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+			<i class="material-icons">scanner</i>
+			<span class="float-btn-label">OCR Scan</span>
+		</button>
+	</div>
+</form>
+
+<div class="floating-button3searchbox">
+<input id="findInput" type="text" placeholder="Search.." name="button_3_searchbox" class="mdl-button2">
+</div>
+
+<form id="find">
+	<div class="floating-button3">
+		<button  type="submit" name="button_3" value="Find" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+			<i class="material-icons">title</i>
+			<span class="float-btn-label">Text Search</span>
+		</button>
+	</div>
+</form>
+
 
 <% include ../partials/dialogs %>
 
 <% include ../partials/js %>
 <script src="/fancybox/jquery.fancybox.min.js"></script>
 <script src="/js/frame.js"></script>
-
+<script src="/js/search.js"></script>
 <% include ../partials/footer %>

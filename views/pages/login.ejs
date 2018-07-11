@@ -11,7 +11,7 @@
 	<script src="/mdlite/material.min.js"></script>
 
 	<link rel="stylesheet" href="/css/frame.css">
-	<title>Photo Frame Sample</title>
+	<title>Milu</title>
 </head>
 
 <body>
@@ -31,19 +31,12 @@
 				<p>Upload images to try</p>
 			</button>
 		</div>
+		<!-- 20180710 Rico:: work on this later, need UI to create user first -->
 		<div class="modal-wrapper">
-			<button id="show-dialog" type="button" class="mdl-button">Log In</button>
-			<!-- <button onClick={this.handleOpen} class="modal-toggle">
-				<p>Log In</p>
-			</button> -->
+			<button id="show-dialog" type="button" class="mdl-button">2018</button>
 			<dialog class="mdl-dialog">
 				<form class="form-signin" onSubmit={this.onSubmit}>
 					<h4 class="mdl-dialog__title">Log In</h4>
-					<!-- {message !== '' &&
-						  <div class="alert alert-warning alert-dismissible" role="alert">
-							{ message }
-						  </div>
-						} -->
 					<div class="mdl-dialog__content">
 						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 							<input class="mdl-textfield__input" type="text" name="username" id="email" />
@@ -62,34 +55,7 @@
 		<form name="uploadImgForm" method="POST" action="/uploadImg" enctype="multipart/form-data">		
 			<input class="mdl-textfield__input" type="file" id="imgInput" name="pic" accept="image/*" hidden>
 		</form>
-		<!-- <header class="demo-header mdl-layout__header--fixed-header mdl-color--primary mdl-color-text--white">
-			<div class="mdl-layout__header-row">
-			          <span class="mdl-layout-title">Photo Frame Sample</span>
-			          <div class="mdl-layout-spacer"></div>
-			          <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable is-upgraded" data-upgraded=",MaterialTextfield">
-
-			          </div>
-			        </div>
-		</header>
-		<main class="demo-main mdl-layout__content">
-			<div class="page-content mdl-grid">
-				<div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
-					 <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
-						<div class="login-img">
-                		  		<img src="/imgs/Photo-frame-illustration.png" alt="Photo frame illustration">
-						</div>
-						  	 <h3>Set up your Photo Frame</h3>
-							 <p>Put your favorite moments on display. To get set up, connect Photo Frame to your photo library.</p>
-						  	 <p>
-								 <button class="gp-button raised" id="login">
-									Connect to Google Photos
-								 </button>
-						 	 </p>
-               	  		</div>
-			  	 	</div>
-           </main>
-	   </div> -->
-
+		
 		<script src="/js/jquery.slim.min.js"></script>
 
 		<script>
