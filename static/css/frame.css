@@ -275,18 +275,25 @@ p .gp-button {
   padding-bottom: 2vh;
 }
 
+.container{
+  position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
 /*from old code intro2cc*/
 
 body {
-  padding-top: 0px;
-  padding-bottom: 0px;
+  position: relative;
+  height: 100%;
   background-color: #eee;
 }
 
 h1{
   font-size: 80px;
-  margin-bottom: 0;
+  margin: 0;
 }
 
 .form-signin {
@@ -352,6 +359,7 @@ h1{
 .btn-big {
   width: 200px;
   height: 200px;
+  padding: 0
 }
 
 .btn-big:hover{
@@ -366,8 +374,8 @@ h1{
 }
 
 .btn-img{
-  width: 50%;
-  height: 50%;
+  width: 40%;
+  height: 40%;
   margin-bottom: 30px;
 }
 
