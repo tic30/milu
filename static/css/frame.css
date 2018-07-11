@@ -236,9 +236,24 @@ p .gp-button {
 
 /* Increase button height just for this */
 
+.mdl-button-login {
+  height: 40px;
+  padding: 0;
+  text-transform: capitalize
+}
+
 .mdl-button {
   height: 40px;
   padding: 0;
+  text-transform: capitalize
+}
+
+.mdl-button1 {
+  height: 40px;
+  padding: 0;
+  width: 120px;
+  text-align: left;
+  padding-left: 4px;
   text-transform: capitalize
 }
 
@@ -246,6 +261,7 @@ p .gp-button {
 .mdl-button2 {
   height: 40px;
   padding: 0;
+  width: 120px;
   text-transform: capitalize
 }
 
@@ -274,8 +290,8 @@ p .gp-button {
 /*from old code intro2cc*/
 
 body {
-  padding-top: 40px;
-  padding-bottom: 40px;
+  padding-top: 0px;
+  padding-bottom: 0px;
   background-color: #eee;
 }
 
