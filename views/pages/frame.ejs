@@ -14,6 +14,38 @@
 			</div>
     	</p>
 	</div> -->
+	<div class="optionsHeader">
+		<div>
+			<div class="search-input-wrapper mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+				<input id="findInput" class="mdl-textfield__input" type="text" name="button_3_searchbox" autofocus>
+				<label class="mdl-textfield__label" for="findInput">Search Text...</label>
+			</div>
+			<form id="find">
+				<button type="submit" name="button_3" value="Find" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect searchBtn">
+					<i class="material-icons">arrow_forward</i>
+				</button>
+				<!-- <button  type="submit" name="button_3" value="Find" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+					<i class="material-icons">title</i>
+					<span class="float-btn-label">Text Search </span>
+				</button> -->
+			</form>
+		</div>
+
+		<form id="filter">
+			<!-- Accent-colored raised button with ripple -->
+			<button  type="submit" name="button_1" value="Search" class="mdl-button mdl-js-button">
+				<i class="material-icons">search</i>
+				<span class="float-btn-label">Show All </span>
+			</button>
+		</form>	
+		
+		<form id="scan">
+			<button  type="submit" name="button_2" value="Update" class="mdl-button mdl-js-button">
+				<i class="material-icons">scanner</i>
+				<span class="float-btn-label">OCR Scan </span>
+			</button>
+		</form>	
+	</div>
 	<div id="images-container"></div>
 	<div id="images_empty" style="display:none">
 			 <!-- <img src="/imgs/null-results.png"> -->
@@ -22,51 +54,12 @@
 	</div>
 </section>
 
-
 <div class="floating-button">
-    <button class="mdl-button1 mdl-js-button mdl-button--raised mdl-button--accent" id="startSlideshow">
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--primary" id="startSlideshow">
         <i class="material-icons" >fullscreen</i>
 		<span class="float-btn-label">Full View </span>
     </button>
 </div>
-
-
-
-<form id="filter">
-
-    <!-- Accent-colored raised button with ripple -->
-    	<div class="floating-button1">
-            <button  type="submit" name="button_1" value="Search" class="mdl-button1 mdl-js-button mdl-button--raised mdl-button--accent">
-                <i class="material-icons">search</i>
-				<span class="float-btn-label">Show All </span>
-            </button>
-        </div>
-
-</form>
-
-
-<form id="scan">
-	<div class="floating-button2">
-		<button  type="submit" name="button_2" value="Update" class="mdl-button1 mdl-js-button mdl-button--raised mdl-button--accent">
-			<i class="material-icons">scanner</i>
-			<span class="float-btn-label">OCR Scan </span>
-		</button>
-	</div>
-</form>
-
-<div class="floating-button3searchbox">
-<input id="findInput" type="text" placeholder="Search.." name="button_3_searchbox" class="mdl-button2">
-</div>
-
-<form id="find">
-	<div class="floating-button3">
-		<button  type="submit" name="button_3" value="Find" class="mdl-button1 mdl-js-button mdl-button--raised mdl-button--accent">
-			<i class="material-icons">title</i>
-			<span class="float-btn-label">Text Search </span>
-		</button>
-	</div>
-</form>
-
 
 <% include ../partials/dialogs %>
 

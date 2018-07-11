@@ -83,32 +83,8 @@ pre {
   bottom: 50px;
 }
 
-.floating-button1 {
-  position: fixed;
-  right: 50px;
-  bottom: 120px;
-}
-
-.floating-button2 {
-  position: fixed;
-  right: 50px;
-  bottom: 330px;
-}
-
-.floating-button3 {
-  position: fixed;
-  right: 50px;
-  bottom: 190px;
-}
-
-.floating-button3searchbox {
-  position: fixed;
-  right: 50px;
-  bottom: 260px;
-  
-  /* border: 3px solid  lightcoral; */
-  /* height : 40px; */
-  /* padding-right; */
+.optionsHeader form{
+  display: inline-block;
 }
 
 .fancybox-bg {
@@ -242,10 +218,23 @@ p .gp-button {
   text-transform: capitalize
 }
 
-.mdl-button {
-  height: 40px;
-  padding: 0;
-  text-transform: capitalize
+.demo-main{
+  width: 100%;
+}
+
+.searchBtn{
+  background: transparent;
+  box-shadow: none;
+  color:#aaa 
+}
+
+.search-input-wrapper{
+  width: calc(100% - 100px);
+  max-width: 500px
+}
+
+.searchBtn:hover{
+  color: #333
 }
 
 .mdl-button1 {
