@@ -23,11 +23,11 @@ function importFilter(filter) {
     dataType: 'json',
     data: filter,
     success: (data) => {
-      console.log('Loaded photos successfully.');
       if (data.photos && data.photos.length > 0) {
         // If the request was successful and images were loaded,
         // go back to the preview screen that shows the grid of images queued
         // for display.
+        console.log('Load images successfully and go back to home');
         window.location = '/';
       } else {
         handleError('No images found', 'Try different search parameters.');
@@ -39,6 +39,44 @@ function importFilter(filter) {
     },
   });
 }
+
+// 20180710 Rico :: 
+function scan(filter) {
+  console.log('AJAX call /loadScanAll');
+
+  $.ajax({
+    type: 'POST',
+    url: '/loadScanAll',
+    dataType: 'json',
+    data: filter,
+    success: (data) => {
+      console.log('Search by text successfully and go back to home');
+      window.location = '/';
+      hideLoadingDialog();
+    },
+    error: (data) => {
+      handleError('Couldn\'t find by text images.', data);
+    },
+  });
+}
+
+function find(filter) {
+  $.ajax({
+    type: 'POST',
+    url: '/loadFind',
+    dataType: 'json',
+    data: filter,
+    success: (data) => {
+      console.log('Scan successfully and go back to home');
+      window.location = '/';
+      hideLoadingDialog();
+    },
+    error: (data) => {
+      handleError('Couldn\'t scan images.', data);
+    },
+  });
+}
+
 
 $(document).ready(() => {
   // Show date filter options based on which date filter type is selected.
@@ -68,6 +106,30 @@ $(document).ready(() => {
   $('#filter').on('submit', (e) => {
     e.preventDefault();
     showLoadingDialog();
-    importFilter($('#filter').serialize())
+    console.log("Filte Photos");
+    importFilter($('#filter').serialize());
   });
+
+  $('#scan').on('submit', (e) => {
+    e.preventDefault();
+    showLoadingDialog();
+    console.log("Scan All Photos");
+    scan($('#scan').serialize());
+  });
+
+  $('#find').on('submit', (e) => {
+    // $('#findInput').click();
+    e.preventDefault();
+    showLoadingDialog();
+    console.log("Search All Photos By Text");
+    find($('#findInput').serialize());
+  });
+
+  // $('#findInput').on('change', (e) => {
+  //   e.preventDefault();
+  //   showLoadingDialog();
+  //   console.log("Search All Photos By Text");
+  //   find($('#findInput').serialize());
+  // });
+
 });

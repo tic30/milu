@@ -1,31 +1,63 @@
 <% include ../partials/head %>
 <section class="sample-content">
 	<div>
-		<h2>Photo frame preview</h2>
-    	<p class="subhead mdl-color-text--grey-700">Welcome to the photo frame sample. Select an option above to load images from your Google Photos library.
-        	<br />Select a photo or use the "View in frame" button to start your photo frame experience!
+		<h2>Photo OCR Search Engine</h2>
+    	<p class="subhead mdl-color-text--grey-700">Welcome to the photo ocr search. Try input a word and then search.
     		</p>
 	</div>
-	<div>
+	<!-- Originally show filter -->
+	<!-- <div>
    	 	<p id="preview-description" style="display: none;">
         	<div class="snippet">
-				<span id="images-count">0</span> images loaded from
+				<span id="images-count">0</span> Key word
         		<pre id="images-source">-</pre>
 			</div>
     	</p>
+	</div> -->
+	<div class="optionsHeader">
+		<div>
+			<div class="search-input-wrapper mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+				<input id="findInput" class="mdl-textfield__input" type="text" name="button_3_searchbox" autofocus>
+				<label class="mdl-textfield__label" for="findInput">Search Text...</label>
+			</div>
+			<form id="find">
+				<button type="submit" name="button_3" value="Find" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect searchBtn">
+					<i class="material-icons">arrow_forward</i>
+				</button>
+				<!-- <button  type="submit" name="button_3" value="Find" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+					<i class="material-icons">title</i>
+					<span class="float-btn-label">Text Search </span>
+				</button> -->
+			</form>
+		</div>
+
+		<form id="filter">
+			<!-- Accent-colored raised button with ripple -->
+			<button  type="submit" name="button_1" value="Search" class="mdl-button mdl-js-button">
+				<i class="material-icons">search</i>
+				<span class="float-btn-label">Show All </span>
+			</button>
+		</form>	
+		
+		<form id="scan">
+			<button  type="submit" name="button_2" value="Update" class="mdl-button mdl-js-button">
+				<i class="material-icons">scanner</i>
+				<span class="float-btn-label">OCR Scan </span>
+			</button>
+		</form>	
 	</div>
 	<div id="images-container"></div>
 	<div id="images_empty" style="display:none">
-	 		<img src="/imgs/null-results.png">
+			 <!-- <img src="/imgs/null-results.png"> -->
+			 <img src="/imgs/back.png">
 	 		<p>No results, try searching again</p>
 	</div>
 </section>
 
-
 <div class="floating-button">
-    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" id="startSlideshow">
-        <i class="material-icons">fullscreen</i>
-		<span class="float-btn-label">View in frame</span>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--primary" id="startSlideshow">
+        <i class="material-icons" >fullscreen</i>
+		<span class="float-btn-label">Full View </span>
     </button>
 </div>
 
@@ -34,5 +66,5 @@
 <% include ../partials/js %>
 <script src="/fancybox/jquery.fancybox.min.js"></script>
 <script src="/js/frame.js"></script>
-
+<script src="/js/search.js"></script>
 <% include ../partials/footer %>
