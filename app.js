@@ -40,7 +40,7 @@ const vision = require('@google-cloud/vision');
 const CLOUD_BUCKET = config.CLOUD_BUCKET;
 
 const gcstorage = Storage({
-  projectId: config.GCLOUD_PROJECT
+    projectId: config.GCLOUD_PROJECT
 });
 const bucket = gcstorage.bucket(CLOUD_BUCKET);
 
@@ -57,11 +57,11 @@ const userSchema = new mongoose.Schema({
 })
 
 const pictureSchema = new mongoose.Schema({
-    idInGooglePhoto:    String,
-    username:           String,
-    publicUrl:          String,
-    baseUrl:            String,
-    texts:              [String]
+    idInGooglePhoto: String,
+    username: String,
+    publicUrl: String,
+    baseUrl: String,
+    texts: [String]
 })
 
 const User = mongoose.model('User', userSchema);
@@ -82,8 +82,8 @@ app.set('view engine', 'ejs');
 // See the 'best practices' and 'acceptable use policy' in the developer
 // documentation.
 const mediaItemCache = persist.create({
-  dir: 'persist-mediaitemcache/',
-  ttl: 3300000,  // 55 minutes
+    dir: 'persist-mediaitemcache/',
+    ttl: 3300000,  // 55 minutes
 });
 mediaItemCache.init();
 
@@ -97,8 +97,8 @@ mediaItemCache.init();
 // Note that this data is only cached temporarily as per the 'best practices' in
 // the developer documentation. Here it expires after 10 minutes.
 const albumCache = persist.create({
-  dir: 'persist-albumcache/',
-  ttl: 600000,  // 10 minutes
+    dir: 'persist-albumcache/',
+    ttl: 600000,  // 10 minutes
 });
 albumCache.init();
 
@@ -122,28 +122,27 @@ auth(passport);
 // NOTE: A secret is used to sign the cookie. This is just used for this sample
 // app and should be changed.
 const sessionMiddleware = session({
-  resave: true,
-  saveUninitialized: true,
-  store: new fileStore({}),
-  secret: 'photo frame sample',
+    resave: true,
+    saveUninitialized: true,
+    store: new fileStore({}),
+    secret: 'photo frame sample',
 });
 
 // Enable extensive logging if the DEBUG environment variable is set.
 if (process.env.DEBUG) {
-  // Print all winston log levels.
-  winston.level = 'silly';
-  // Enable express.js debugging. This logs all received requests.
-  app.use(expressWinston.logger({
-    transports:
-        [new winston.transports.Console({json: true, colorize: true})]
-  }));
-  // Enable request debugging.
-  require('request-promise').debug = true;
+    // Print all winston log levels.
+    winston.level = 'silly';
+    // Enable express.js debugging. This logs all received requests.
+    app.use(expressWinston.logger({
+        transports:
+            [new winston.transports.Console({json: true, colorize: true})]
+    }));
+    // Enable request debugging.
+    require('request-promise').debug = true;
 } else {
-  // By default, only print all 'info' log level messages or below.
-  winston.level = 'verbose';
+    // By default, only print all 'info' log level messages or below.
+    winston.level = 'verbose';
 }
-
 
 
 // Set up static routes for hosted libraries.
@@ -155,7 +154,6 @@ app.use(
 app.use(
     '/mdlite',
     express.static(__dirname + '/node_modules/material-design-lite/dist/'));
-
 
 
 // Parse application/json request data.
@@ -174,17 +172,17 @@ app.use(passport.session());
 // Middleware that adds the user of this session as a local variable,
 // so it can be displayed on all pages when logged in.
 app.use((req, res, next) => {
-  res.locals.name = '-';
-  if (req.user && req.user.profile && req.user.profile.name) {
-    res.locals.name =
-        req.user.profile.name.givenName || req.user.profile.displayName;
-  }
+    res.locals.name = '-';
+    if (req.user && req.user.profile && req.user.profile.name) {
+        res.locals.name =
+            req.user.profile.name.givenName || req.user.profile.displayName;
+    }
 
-  res.locals.avatarUrl = '';
-  if (req.user && req.user.profile && req.user.profile.photos) {
-    res.locals.avatarUrl = req.user.profile.photos[0].value;
-  }
-  next();
+    res.locals.avatarUrl = '';
+    if (req.user && req.user.profile && req.user.profile.photos) {
+        res.locals.avatarUrl = req.user.profile.photos[0].value;
+    }
+    next();
 });
 
 
@@ -192,25 +190,25 @@ app.use((req, res, next) => {
 // Display the login screen if the user is not logged in yet, otherwise the
 // photo frame.
 app.get('/', (req, res) => {
-  winston.log('req.user::'+req.user);
-  // 20180710 Rico:: Rightnow, !req.user always = True, since req.user = null
-  if (!req.user || !req.isAuthenticated()) {
-    // Not logged in yet.
-    winston.info('Branch to login page');
-    res.render('pages/login');
-  } else {
-    winston.info('Branch to frame page');
-    res.render('pages/frame');
-  }
+    winston.log('req.user::' + req.user);
+    // 20180710 Rico:: Rightnow, !req.user always = True, since req.user = null
+    if (!req.user || !req.isAuthenticated()) {
+        // Not logged in yet.
+        winston.info('Branch to login page');
+        res.render('pages/login');
+    } else {
+        winston.info('Branch to frame page');
+        res.render('pages/frame');
+    }
 });
 
 // GET request to log out the user.
 // Destroy the current session and redirect back to the log in screen.
 app.get('/logout', (req, res) => {
-  req.logout();
-  // req.session.destroy();
-  delete req.session.authStatus;
-  res.redirect('/');
+    req.logout();
+    // req.session.destroy();
+    delete req.session.authStatus;
+    res.redirect('/');
 });
 
 // Star the OAuth login process for Google.
@@ -218,9 +216,9 @@ app.get('/logout', (req, res) => {
 // the user back to the application at
 //     /auth/google/callback
 app.get('/auth/google', passport.authenticate('google', {
-  scope: config.scopes,
-  failureFlash: true,  // Display errors to the user.
-  session: true,
+    scope: config.scopes,
+    failureFlash: true,  // Display errors to the user.
+    session: true,
 }));
 
 // Callback receiver for the OAuth process after log in.
@@ -229,23 +227,23 @@ app.get(
     passport.authenticate(
         'google', {failureRedirect: '/', failureFlash: true, session: true}),
     (req, res) => {
-      // User has logged in.
-      winston.info('User has Auth and will log in.');
-      winston.info('req.isAuthenticated()::'+req.isAuthenticated());
+        // User has logged in.
+        winston.info('User has Auth and will log in.');
+        winston.info('req.isAuthenticated()::' + req.isAuthenticated());
 
-      res.redirect('/');
+        res.redirect('/');
     });
 
 // Loads the search page if the user is authenticated.
 // This page includes the search form.
 app.get('/search', (req, res) => {
-  renderIfAuthenticated(req, res, 'pages/search');
+    renderIfAuthenticated(req, res, 'pages/search');
 });
 
 // Loads the album page if the user is authenticated.
 // This page displays a list of albums owned by the user.
 app.get('/album', (req, res) => {
-  renderIfAuthenticated(req, res, 'pages/album');
+    renderIfAuthenticated(req, res, 'pages/album');
 });
 
 
@@ -257,54 +255,54 @@ app.get('/album', (req, res) => {
 // Returns a list of media items if the search was successful, or an error
 // otherwise.
 app.post('/loadFromSearch', async (req, res) => {
-  const authToken = req.user.token;
+    const authToken = req.user.token;
 
-  winston.info('Loading images from search.');
-  winston.silly('Received form data: ', req.body);
+    winston.info('Loading images from search.');
+    winston.silly('Received form data: ', req.body);
 
-  // Construct a filter for photos.
-  // Other parameters are added below based on the form submission.
-  const filters = {contentFilter: {}, mediaTypeFilter: {mediaTypes: ['PHOTO']}};
+    // Construct a filter for photos.
+    // Other parameters are added below based on the form submission.
+    const filters = {contentFilter: {}, mediaTypeFilter: {mediaTypes: ['PHOTO']}};
 
-  if (req.body.includedCategories) {
-    // Included categories are set in the form. Add them to the filter.
-    filters.contentFilter.includedContentCategories =
-        [req.body.includedCategories];
-  }
-
-  if (req.body.excludedCategories) {
-    // Excluded categories are set in the form. Add them to the filter.
-    filters.contentFilter.excludedContentCategories =
-        [req.body.excludedCategories];
-  }
-
-  // Add a date filter if set, either as exact or as range.
-  if (req.body.dateFilter == 'exact') {
-    filters.dateFilter = {
-      dates: constructDate(
-          req.body.exactYear, req.body.exactMonth, req.body.exactDay),
+    if (req.body.includedCategories) {
+        // Included categories are set in the form. Add them to the filter.
+        filters.contentFilter.includedContentCategories =
+            [req.body.includedCategories];
     }
-  } else if (req.body.dateFilter == 'range') {
-    filters.dateFilter = {
-      ranges: [{
-        startDate: constructDate(
-            req.body.startYear, req.body.startMonth, req.body.startDay),
-        endDate:
-            constructDate(req.body.endYear, req.body.endMonth, req.body.endDay),
-      }]
+
+    if (req.body.excludedCategories) {
+        // Excluded categories are set in the form. Add them to the filter.
+        filters.contentFilter.excludedContentCategories =
+            [req.body.excludedCategories];
     }
-  }
 
-  // Create the parameters that will be submitted to the Library API.
-  const parameters = {filters};
+    // Add a date filter if set, either as exact or as range.
+    if (req.body.dateFilter == 'exact') {
+        filters.dateFilter = {
+            dates: constructDate(
+                req.body.exactYear, req.body.exactMonth, req.body.exactDay),
+        }
+    } else if (req.body.dateFilter == 'range') {
+        filters.dateFilter = {
+            ranges: [{
+                startDate: constructDate(
+                    req.body.startYear, req.body.startMonth, req.body.startDay),
+                endDate:
+                    constructDate(req.body.endYear, req.body.endMonth, req.body.endDay),
+            }]
+        }
+    }
 
-  // Submit the search request to the API and wait for the result.
-  const data = await libraryApiSearch(authToken, parameters);
-  winston.info('filter::data: ' + + JSON.stringify(parameters));  
+    // Create the parameters that will be submitted to the Library API.
+    const parameters = {filters};
 
-  // Return and cache the result and parameters.
-  const userId = req.user.profile.id;
-  returnPhotos(res, userId, data, parameters);
+    // Submit the search request to the API and wait for the result.
+    const data = await libraryApiSearch(authToken, parameters);
+    winston.info('filter::data: ' + +JSON.stringify(parameters));
+
+    // Return and cache the result and parameters.
+    const userId = req.user.profile.id;
+    returnPhotos(res, userId, data, parameters);
 });
 
 // Handles form scan submissions from the search page.
@@ -313,71 +311,92 @@ app.post('/loadFromSearch', async (req, res) => {
 // 2. Then, call Google Vision API eg. OCR, return JSON
 // 3. Save to DB
 app.post('/loadScanAll', async (req, res) => {
-  const authToken = req.user.token;
+    const authToken = req.user.token;
 
-  winston.info('1. Scanning images from album.');
-  const filters = {contentFilter: {}, mediaTypeFilter: {mediaTypes: ['PHOTO']}};
-  const parameters = {filters};
-  const data = await libraryApiSearch(authToken, parameters);
+    winston.info('1. Scanning images from album.');
+    const filters = {contentFilter: {}, mediaTypeFilter: {mediaTypes: ['PHOTO']}};
+    const parameters = {filters};
+    const data = await libraryApiSearch(authToken, parameters);
 
-  winston.info('2. OCR processing. 3. Save to DB');
+    winston.info('2. OCR processing. 3. Save to DB');
 
-  const userId = req.user.profile.id;
-  createUser(userId);
+    const userId = req.user.profile.id;
+    createUser(userId);
 
-  const client = new vision.ImageAnnotatorClient();
-  (data.photos).forEach(function(value){
- 
-    client
-      .textDetection(value.baseUrl)
-      .then(results => {
-          const detections = results[0].textAnnotations;
-          const fullImgUrl = value.baseUrl+`=w${value.mediaMetadata.width}-h${value.mediaMetadata.height}`;
+    var extractText = '';
+    var labelText = '';
 
-          // FIXME ::
-          // Rico :: Save JSON to DB
-          createPicture(value.id, userId, fullImgUrl, value.baseUrl, detections);
+    const client = new vision.ImageAnnotatorClient();
+    (data.photos).forEach(function (value) {
 
-      })
-      .catch(err => {
-          console.error('ERROR:', err);
-      });
+        client
+            .textDetection(value.baseUrl)
+            .then(results => {
+                const extractTextResponse = results[0].textAnnotations;
+                const fullImgUrl = value.baseUrl + `=w${value.mediaMetadata.width}-h${value.mediaMetadata.height}`;
 
-  });
-  
-  // Return and cache the result and parameters.
-  returnPhotos(res, userId, data, parameters);
-  
+                extractText = phaseTextExtractResponseJSON(extractTextResponse);
+
+                // Make Label Detection Call;
+                client
+                    .labelDetection(value.baseUrl)
+                    .then(results => {
+                        const labelsResponse = results[0].labelAnnotations;
+                        winston.info('Label Detection Done');
+
+                        labelText = phaseLabelDetectionResponseJSON(labelsResponse);
+                        winston.info("in client call, labelText is:" + labelText);
+
+                        // res.render('pages/picture_v2', {
+                        //     imgurl: data.imageUrl,
+                        //     para: extractText +','+ labelText
+                        // });
+                        winston.info(' extractText + labelText is:'+extractText +','+ labelText);
+
+                        // Save JSON to DB
+                        winston.info("start to Save Image and Text Into MongoDB");
+                        createPicture(value.id, userId, fullImgUrl, value.baseUrl, extractText +','+ labelText);
+                        winston.info("End DB Save!");
+                    })
+            })
+            .catch(err => {
+                console.error('ERROR:', err);
+            });
+    });
+
+    // Return and cache the result and parameters.
+    returnPhotos(res, userId, data, parameters);
+
 });
 
 app.post('/loadFind', async (req, res) => {
-  const authToken = req.user.token;
+    const authToken = req.user.token;
 
-  winston.info('Loading images from search.');
-  winston.info('??????? Received form data: ', req.body);
-  winston.info('????? ::req.body: '+ JSON.stringify(req.body));  
-  winston.info('????? ::req.box: '+ req.body.button_3_searchbox);
-  
-  const input_search_text = req.body.button_3_searchbox;
+    winston.info('Loading images from search.');
+    winston.info('??????? Received form data: ', req.body);
+    winston.info('????? ::req.body: ' + JSON.stringify(req.body));
+    winston.info('????? ::req.box: ' + req.body.button_3_searchbox);
 
-  // Construct a filter for photos.
-  // Other parameters are added below based on the form submission.
-  const filters = {contentFilter: {}, mediaTypeFilter: {mediaTypes: ['PHOTO']}};
+    const input_search_text = req.body.button_3_searchbox;
 
-  // Create the parameters that will be submitted to the Library API.
-  const parameters = {filters};
-  const userId = req.user.profile.id;
+    // Construct a filter for photos.
+    // Other parameters are added below based on the form submission.
+    const filters = {contentFilter: {}, mediaTypeFilter: {mediaTypes: ['PHOTO']}};
 
-  // 1. Get list of imageId based on username and text
-  winston.debug(req.user.profile)
-  var array_googleImageId = await getPicturesByUsernameAndText(userId, input_search_text);
-  winston.debug(array_googleImageId);
+    // Create the parameters that will be submitted to the Library API.
+    const parameters = {filters};
+    const userId = req.user.profile.id;
 
-  // 2. Get by array of imageId from step 2
-  const data = await libraryApiGet(authToken, parameters, array_googleImageId);
+    // 1. Get list of imageId based on username and text
+    winston.debug(req.user.profile)
+    var array_googleImageId = await getPicturesByUsernameAndText(userId, input_search_text);
+    winston.debug(array_googleImageId);
 
-  // Return and cache the result and parameters.
-  returnPhotos(res, userId, data, parameters);
+    // 2. Get by array of imageId from step 2
+    const data = await libraryApiGet(authToken, parameters, array_googleImageId);
+
+    // Return and cache the result and parameters.
+    returnPhotos(res, userId, data, parameters);
 });
 
 // Handles selections from the album page where an album ID is submitted.
@@ -386,54 +405,54 @@ app.post('/loadFind', async (req, res) => {
 // Submits a search for all media items in an album to the Library API.
 // Returns a list of photos if this was successful, or an error otherwise.
 app.post('/loadFromAlbum', async (req, res) => {
-  const albumId = req.body.albumId;
-  const userId = req.user.profile.id;
-  const authToken = req.user.token;
+    const albumId = req.body.albumId;
+    const userId = req.user.profile.id;
+    const authToken = req.user.token;
 
-  winston.info(`Importing album: ${albumId}`);
+    winston.info(`Importing album: ${albumId}`);
 
-  // To list all media in an album, construct a search request
-  // where the only parameter is the album ID.
-  // Note that no other filters can be set, so this search will
-  // also return videos that are otherwise filtered out in libraryApiSearch(..).
-  const parameters = {albumId};
+    // To list all media in an album, construct a search request
+    // where the only parameter is the album ID.
+    // Note that no other filters can be set, so this search will
+    // also return videos that are otherwise filtered out in libraryApiSearch(..).
+    const parameters = {albumId};
 
-  // Submit the search request to the API and wait for the result.
-  const data = await libraryApiSearch(authToken, parameters);
+    // Submit the search request to the API and wait for the result.
+    const data = await libraryApiSearch(authToken, parameters);
 
-  returnPhotos(res, userId, data, parameters)
+    returnPhotos(res, userId, data, parameters)
 });
 
 // Returns all albums owned by the user.
 app.get('/getAlbums', async (req, res) => {
-  winston.info('Loading albums');
-  const userId = req.user.profile.id;
+    winston.info('Loading albums');
+    const userId = req.user.profile.id;
 
-  // Attempt to load the albums from cache if available.
-  // Temporarily caching the albums makes the app more responsive.
-  const cachedAlbums = await albumCache.getItem(userId);
-  if (cachedAlbums) {
-    winston.verbose('Loaded albums from cache.');
-    res.status(200).send(cachedAlbums);
-  } else {
-    winston.verbose('Loading albums from API.');
-    // Albums not in cache, retrieve the albums from the Library API
-    // and return them
-    const data = await libraryApiGetAlbums(req.user.token);
-    if (data.error) {
-      // Error occured during the request. Albums could not be loaded.
-      returnError(res, data);
-      // Clear the cached albums.
-      albumCache.removeItem(userId);
+    // Attempt to load the albums from cache if available.
+    // Temporarily caching the albums makes the app more responsive.
+    const cachedAlbums = await albumCache.getItem(userId);
+    if (cachedAlbums) {
+        winston.verbose('Loaded albums from cache.');
+        res.status(200).send(cachedAlbums);
     } else {
-      // Albums were successfully loaded from the API. Cache them
-      // temporarily to speed up the next request and return them.
-      // The cache implementation automatically clears the data when the TTL is
-      // reached.
-      res.status(200).send(data);
-      albumCache.setItemSync(userId, data);
+        winston.verbose('Loading albums from API.');
+        // Albums not in cache, retrieve the albums from the Library API
+        // and return them
+        const data = await libraryApiGetAlbums(req.user.token);
+        if (data.error) {
+            // Error occured during the request. Albums could not be loaded.
+            returnError(res, data);
+            // Clear the cached albums.
+            albumCache.removeItem(userId);
+        } else {
+            // Albums were successfully loaded from the API. Cache them
+            // temporarily to speed up the next request and return them.
+            // The cache implementation automatically clears the data when the TTL is
+            // reached.
+            res.status(200).send(data);
+            albumCache.setItemSync(userId, data);
+        }
     }
-  }
 });
 
 
@@ -443,37 +462,37 @@ app.get('/getAlbums', async (req, res) => {
 // returned, otherwise the search parameters that were used to load the photos
 // are resubmitted to the API and the result returned.
 app.get('/getQueue', async (req, res) => {
-  const userId = req.user.profile.id;
-  const authToken = req.user.token;
+    const userId = req.user.profile.id;
+    const authToken = req.user.token;
 
-  winston.info('Loading queue.');
+    winston.info('Loading queue.');
 
-  // Attempt to load the queue from cache first. This contains full mediaItems
-  // that include URLs. Note that these expire after 1 hour. The TTL on this
-  // cache has been set to this limit and it is cleared automatically when this
-  // time limit is reached. Caching this data makes the app more responsive,
-  // as it can be returned directly from memory whenever the user navigates
-  // back to the photo frame.
-  const cachedPhotos = await mediaItemCache.getItem(userId);
-  const stored = await storage.getItem(userId);
+    // Attempt to load the queue from cache first. This contains full mediaItems
+    // that include URLs. Note that these expire after 1 hour. The TTL on this
+    // cache has been set to this limit and it is cleared automatically when this
+    // time limit is reached. Caching this data makes the app more responsive,
+    // as it can be returned directly from memory whenever the user navigates
+    // back to the photo frame.
+    const cachedPhotos = await mediaItemCache.getItem(userId);
+    const stored = await storage.getItem(userId);
 
-  if (cachedPhotos) {
-    // Items are still cached. Return them.
-    winston.verbose('Returning cached photos.');
-    res.status(200).send({photos: cachedPhotos, parameters: stored.parameters});
-  } else if (stored && stored.parameters) {
-    // Items are no longer cached. Resubmit the stored search query and return
-    // the result.
-    winston.verbose(
-        `Resubmitting filter search ${JSON.stringify(stored.parameters)}`);
-    const data = await libraryApiSearch(authToken, stored.parameters);
-    returnPhotos(res, userId, data, stored.parameters);
-  } else {
-    // No data is stored yet for the user. Return an empty response.
-    // The user is likely new.
-    winston.verbose('No cached data.')
-    res.status(200).send({});
-  }
+    if (cachedPhotos) {
+        // Items are still cached. Return them.
+        winston.verbose('Returning cached photos.');
+        res.status(200).send({photos: cachedPhotos, parameters: stored.parameters});
+    } else if (stored && stored.parameters) {
+        // Items are no longer cached. Resubmit the stored search query and return
+        // the result.
+        winston.verbose(
+            `Resubmitting filter search ${JSON.stringify(stored.parameters)}`);
+        const data = await libraryApiSearch(authToken, stored.parameters);
+        returnPhotos(res, userId, data, stored.parameters);
+    } else {
+        // No data is stored yet for the user. Return an empty response.
+        // The user is likely new.
+        winston.verbose('No cached data.')
+        res.status(200).send({});
+    }
 });
 
 // Multer handles parsing multipart/form-data requests.
@@ -481,124 +500,138 @@ app.get('/getQueue', async (req, res) => {
 // This makes it straightforward to upload to Cloud Storage.
 // [START multer]
 const multer1 = multer({
-  storage: multer.MemoryStorage,
-  limits: {
-    fileSize: 15 * 1024 * 1024 // no larger than 5mb
-  }
+    storage: multer.MemoryStorage,
+    limits: {
+        fileSize: 15 * 1024 * 1024 // no larger than 5mb
+    }
 });
 // [END multer]
 
 app.post(
-  '/uploadImg',
-  multer1.single('pic'),
-  sendUploadToGCS,
-  (req, res, next) => {
-    let data = req.body;
+    '/uploadImg',
+    multer1.single('pic'),
+    sendUploadToGCS,
+    (req, res, next) => {
+        let data = req.body;
 
-    // Was an image uploaded? If so, we'll use its public URL
-    // in cloud storage.
-    if (req.file && req.file.cloudStoragePublicUrl) {
-      data.imageUrl = req.file.cloudStoragePublicUrl;
-      console.log("Image uploaded to bucket. url: " + data.imageUrl);
+        // Was an image uploaded? If so, we'll use its public URL
+        // in cloud storage.
+        if (req.file && req.file.cloudStoragePublicUrl) {
+            data.imageUrl = req.file.cloudStoragePublicUrl;
+            console.log("Image uploaded to bucket. url: " + data.imageUrl);
 
 
-    } else {
-      console.log("Image uploaded to bucket fail");
-      res.status(206).send({});
+        } else {
+            console.log("Image uploaded to bucket fail");
+            res.status(206).send({});
+        }
+
+
+        // 20180709 Rico:
+        // Add Zhanghe's Google Vision API call code
+        // Input:   image url from bucket
+        // Output:  JSON response. Then pass to Rico's DB function
+        // ...
+
+        // Imports the Google Cloud client library
+        const client = new vision.ImageAnnotatorClient();
+        var extractText = '';
+        var labelText = '';
+        client
+            .textDetection(data.imageUrl)
+            .then(results => {
+                const extractTextResponse = results[0].textAnnotations;
+                console.log('Text OCR Done');
+                // detections.forEach(text => console.log(text));
+                // const fullImgUrl = data.imageUrl;
+                // FIXME :: googleImgId ?, userId ?
+                // Rico :: Save to DB
+                // createPicture(value.id, userId, fullImgUrl, data.imageUrl, detections);
+                // res.status(200).send(detections);
+                // res.status(200).send(data.imageUrl);
+
+                // add one function which has threadhold;
+                extractText = phaseTextExtractResponseJSON(extractTextResponse);
+                console.log('in client call, extractText is:' + extractText);
+
+                // Make Label Detection call;
+                client
+                    .labelDetection(data.imageUrl)
+                    .then(results => {
+                        const labelsResponse = results[0].labelAnnotations;
+                        console.log('Label Detection Done');
+
+                        labelText = phaseLabelDetectionResponseJSON(labelsResponse);
+                        console.log("in client call, labelText is:" + labelText);
+
+                        res.render('pages/picture_v2', {
+                            imgurl: data.imageUrl,
+                            para: extractText +','+ labelText
+                        });
+                        console.log(' extractText + labelText is:'+extractText +','+ labelText);
+                    })
+
+                // FIXME 然后显示什么页面呢？
+            })
+            .catch(err => {
+                console.error('ERROR:', err);
+            });
     }
-
-
-    // 20180709 Rico:
-    // Add Zhanghe's Google Vision API call code
-    // Input:   image url from bucket
-    // Output:  JSON response. Then pass to Rico's DB function
-    // ...
-
-    // Imports the Google Cloud client library
-    const client = new vision.ImageAnnotatorClient();
-    client
-        .textDetection(data.imageUrl)
-        .then(results => {
-            const detections = results[0].textAnnotations;
-            console.log('Text OCR Done');
-            // detections.forEach(text => console.log(text));
-            // const fullImgUrl = data.imageUrl;
-            // FIXME :: googleImgId ?, userId ? 
-            // Rico :: Save to DB
-            // createPicture(value.id, userId, fullImgUrl, data.imageUrl, detections);
-            // res.status(200).send(detections);
-            // res.status(200).send(data.imageUrl);
-
-            // add one function which has threadhold;
-            const text_arr = phaseGoogleApiResponseJSON(detections);
-            res.render('pages/picture_v2', {
-              imgurl: data.imageUrl,
-              para: text_arr
-          });
-
-            // FIXME 然后显示什么页面呢？
-        })
-        .catch(err => {
-            console.error('ERROR:', err);
-        });
-  }
 );
 
 
-
-
-function getPublicUrl (filename) {
-  return `https://storage.googleapis.com/${CLOUD_BUCKET}/${filename}`;
+function getPublicUrl(filename) {
+    return `https://storage.googleapis.com/${CLOUD_BUCKET}/${filename}`;
 }
 
-function sendUploadToGCS (req, res, next) {
-  if (!req.file) {
-    return next();
-  }
+function sendUploadToGCS(req, res, next) {
+    if (!req.file) {
+        return next();
+    }
 
-  const gcsname = Date.now() + '_' + req.file.originalname;
-  const file = bucket.file(gcsname);
+    const gcsname = Date.now() + '_' + req.file.originalname;
+    const file = bucket.file(gcsname);
 
-  const stream = file.createWriteStream({
-    metadata: {
-      contentType: req.file.mimetype
-    },
-    resumable: false
-  });
-
-  stream.on('error', (err) => {
-    req.file.cloudStorageError = err;
-    next(err);
-  });
-
-  stream.on('finish', () => {
-    req.file.cloudStorageObject = gcsname;
-    file.makePublic().then(() => {
-      req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
-      next();
+    const stream = file.createWriteStream({
+        metadata: {
+            contentType: req.file.mimetype
+        },
+        resumable: false
     });
-  });
 
-  stream.end(req.file.buffer);
+    stream.on('error', (err) => {
+        req.file.cloudStorageError = err;
+        next(err);
+    });
+
+    stream.on('finish', () => {
+        req.file.cloudStorageObject = gcsname;
+        file.makePublic().then(() => {
+            req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
+            next();
+        });
+    });
+
+    stream.end(req.file.buffer);
 }
-// [END process]
 
+// [END process]
 
 
 // Start the server
 server.listen(config.port, () => {
-  console.log(`App listening on port ${config.port}`);
-  console.log('Press Ctrl+C to quit.');
+    console.log(`App listening on port ${config.port}`);
+    console.log('Press Ctrl+C to quit.');
 });
 
 // Renders the given page if the user is authenticated.
 // Otherwise, redirects to "/".
 function renderIfAuthenticated(req, res, page) {
-  if (!req.user || !req.isAuthenticated()) {
-    res.redirect('/');
-  } else {
-    res.render(page);
-  }
+    if (!req.user || !req.isAuthenticated()) {
+        res.redirect('/');
+    } else {
+        res.render(page);
+    }
 }
 
 // If the supplied result is succesful, the parameters and media items are
@@ -609,44 +642,44 @@ function renderIfAuthenticated(req, res, page) {
 // Otherwise, the media items are cached, the search parameters are stored
 // and they are returned in the response.
 function returnPhotos(res, userId, data, searchParameter) {
-  if (data.error) {
-    returnError(res, data)
-  } else {
-    // Remove the pageToken and pageSize from the search parameters.
-    // They will be set again when the request is submitted but don't need to be
-    // stored.
-    delete searchParameter.pageToken;
-    delete searchParameter.pageSize;
+    if (data.error) {
+        returnError(res, data)
+    } else {
+        // Remove the pageToken and pageSize from the search parameters.
+        // They will be set again when the request is submitted but don't need to be
+        // stored.
+        delete searchParameter.pageToken;
+        delete searchParameter.pageSize;
 
-    // Cache the media items that were loaded temporarily.
-    mediaItemCache.setItemSync(userId, data.photos);
-    // Store the parameters that were used to load these images. They are used
-    // to resubmit the query after the cache expires.
-    storage.setItemSync(userId, {parameters: searchParameter});
+        // Cache the media items that were loaded temporarily.
+        mediaItemCache.setItemSync(userId, data.photos);
+        // Store the parameters that were used to load these images. They are used
+        // to resubmit the query after the cache expires.
+        storage.setItemSync(userId, {parameters: searchParameter});
 
-    // Return the photos and parameters back int the response.
-    res.status(200).send({photos: data.photos, parameters: searchParameter});
-  }
+        // Return the photos and parameters back int the response.
+        res.status(200).send({photos: data.photos, parameters: searchParameter});
+    }
 }
 
 // Responds with an error status code and the encapsulated data.error.
 function returnError(res, data) {
-  // Return the same status code that was returned in the error or use 500
-  // otherwise.
-  const statusCode = data.error.code || 500;
-  // Return the error.
-  res.status(statusCode).send(data.error);
+    // Return the same status code that was returned in the error or use 500
+    // otherwise.
+    const statusCode = data.error.code || 500;
+    // Return the error.
+    res.status(statusCode).send(data.error);
 }
 
 // Constructs a date object required for the Library API.
 // Undefined parameters are not set in the date object, which the API sees as a
 // wildcard.
 function constructDate(year, month, day) {
-  const date = {};
-  if (year) date.year = year;
-  if (month) date.month = month;
-  if (day) date.day = day;
-  return date;
+    const date = {};
+    if (year) date.year = year;
+    if (month) date.month = month;
+    if (day) date.day = day;
+    return date;
 }
 
 // Submits a search request to the Google Photos Library API for the given
@@ -656,68 +689,68 @@ function constructDate(year, month, day) {
 // as requested. This may result in more items being listed in the response than
 // originally requested.
 async function libraryApiSearch(authToken, parameters) {
-  let photos = [];
-  let nextPageToken = null;
-  let error = null;
+    let photos = [];
+    let nextPageToken = null;
+    let error = null;
 
-  parameters.pageSize = config.searchPageSize;
+    parameters.pageSize = config.searchPageSize;
 
-  try {
-    // Loop while the number of photos threshold has not been met yet
-    // and while there is a nextPageToken to load more items.
-    do {
-      winston.info(
-          `Searching all images with parameters: ${JSON.stringify(parameters)}`);
+    try {
+        // Loop while the number of photos threshold has not been met yet
+        // and while there is a nextPageToken to load more items.
+        do {
+            winston.info(
+                `Searching all images with parameters: ${JSON.stringify(parameters)}`);
 
-      // Make a POST request to search the library or album
-      const result =
-          await request.post(config.apiEndpoint + '/v1/mediaItems:search', {
-            headers: {'Content-Type': 'application/json'},
-            json: parameters,
-            auth: {'bearer': authToken},
-          });
+            // Make a POST request to search the library or album
+            const result =
+                await request.post(config.apiEndpoint + '/v1/mediaItems:search', {
+                    headers: {'Content-Type': 'application/json'},
+                    json: parameters,
+                    auth: {'bearer': authToken},
+                });
 
-      winston.debug(`Response: ${result}`);
-      // winston.info(`POST by searchAll response: ${JSON.stringify(result)}`);
+            winston.debug(`Response: ${result}`);
+            // winston.info(`POST by searchAll response: ${JSON.stringify(result)}`);
 
-      // The list of media items returned may be sparse and contain missing
-      // elements. Remove all invalid elements.
-      // Also remove all elements that are not images by checking its mime type.
-      // Media type filters can't be applied if an album is loaded, so an extra
-      // filter step is required here to ensure that only images are returned.
-      const items = result && result.mediaItems ?
-          result.mediaItems
-              .filter(x => x)  // Filter empty or invalid items.
-              // Only keep media items with an image mime type.
-              .filter(x => x.mimeType && x.mimeType.startsWith('image/')) :
-          [];
+            // The list of media items returned may be sparse and contain missing
+            // elements. Remove all invalid elements.
+            // Also remove all elements that are not images by checking its mime type.
+            // Media type filters can't be applied if an album is loaded, so an extra
+            // filter step is required here to ensure that only images are returned.
+            const items = result && result.mediaItems ?
+                result.mediaItems
+                    .filter(x => x)  // Filter empty or invalid items.
+                    // Only keep media items with an image mime type.
+                    .filter(x => x.mimeType && x.mimeType.startsWith('image/')) :
+                [];
 
-      photos = photos.concat(items);
+            photos = photos.concat(items);
 
-      // Set the pageToken for the next request.
-      parameters.pageToken = result.nextPageToken;
+            // Set the pageToken for the next request.
+            parameters.pageToken = result.nextPageToken;
 
-      winston.verbose(
-          `Found ${items.length} images in this request. Total images: ${
-              photos.length}`);
+            winston.verbose(
+                `Found ${items.length} images in this request. Total images: ${
+                    photos.length}`);
 
-      // Loop until the required number of photos has been loaded or until there
-      // are no more photos, ie. there is no pageToken.
-    } while (photos.length < config.photosToLoad &&
-             parameters.pageToken != null);
+            // Loop until the required number of photos has been loaded or until there
+            // are no more photos, ie. there is no pageToken.
+        } while (photos.length < config.photosToLoad &&
+        parameters.pageToken != null);
 
-  } catch (err) {
-    // If the error is a StatusCodeError, it contains an error.error object that
-    // should be returned. It has a name, statuscode and message in the correct
-    // format. Otherwise extract the properties.
-    error = err.error.error ||
-        {name: err.name, code: err.statusCode, message: err.message};
-    winston.error(error);
-  }
+    } catch (err) {
+        // If the error is a StatusCodeError, it contains an error.error object that
+        // should be returned. It has a name, statuscode and message in the correct
+        // format. Otherwise extract the properties.
+        error = err.error.error ||
+            {name: err.name, code: err.statusCode, message: err.message};
+        winston.error(error);
+    }
 
 
-  winston.info('Search complete.');
-  return {photos, parameters, error};
+    winston.info('Search complete.');
+    return {photos, parameters, error};
 }
 
 // Submits a search request to the Google Photos Library API for the given
@@ -727,239 +760,253 @@ async function libraryApiSearch(authToken, parameters) {
 // as requested. This may result in more items being listed in the response than
 // originally requested.
 async function libraryApiGet(authToken, parameters, arr_img_id) {
-  let photos = [];
-  let nextPageToken = null;
-  let error = null;
+    let photos = [];
+    let nextPageToken = null;
+    let error = null;
 
-  parameters.pageSize = config.searchPageSize;
+    parameters.pageSize = config.searchPageSize;
 
-  try {
-   
-    do {
-      winston.info(`Submitting get with parameters: ${JSON.stringify(parameters)}`);
-      const result =
-          await request.post(config.apiEndpoint + '/v1/mediaItems:search', {
-            headers: {'Content-Type': 'application/json'},
-            json: parameters,
-            auth: {'bearer': authToken},
-          });
+    try {
 
-      const items = result && result.mediaItems ?
-          result.mediaItems
-              .filter(x => arr_img_id.includes(x.id)) :
-          [];
- 
-      photos = photos.concat(items);
+        do {
+            winston.info(`Submitting get with parameters: ${JSON.stringify(parameters)}`);
+            const result =
+                await request.post(config.apiEndpoint + '/v1/mediaItems:search', {
+                    headers: {'Content-Type': 'application/json'},
+                    json: parameters,
+                    auth: {'bearer': authToken},
+                });
 
-      // Set the pageToken for the next request.
-      parameters.pageToken = result.nextPageToken;
+            const items = result && result.mediaItems ?
+                result.mediaItems
+                    .filter(x => arr_img_id.includes(x.id)) :
+                [];
 
-      winston.verbose(
-          `Found ${items.length} images in this request. Total images: ${
-              photos.length}`);
+            photos = photos.concat(items);
 
-      // Loop until the required number of photos has been loaded or until there
-      // are no more photos, ie. there is no pageToken.
-    } while (photos.length < config.photosToLoad &&
-             parameters.pageToken != null);
+            // Set the pageToken for the next request.
+            parameters.pageToken = result.nextPageToken;
 
-  } catch (err) {
-    // If the error is a StatusCodeError, it contains an error.error object that
-    // should be returned. It has a name, statuscode and message in the correct
-    // format. Otherwise extract the properties.
-    error = err.error.error ||
-        {name: err.name, code: err.statusCode, message: err.message};
-    winston.error(error);
-  }
+            winston.verbose(
+                `Found ${items.length} images in this request. Total images: ${
+                    photos.length}`);
 
-  winston.info('Search by text complete.');
-  return {photos, parameters, error};
+            // Loop until the required number of photos has been loaded or until there
+            // are no more photos, ie. there is no pageToken.
+        } while (photos.length < config.photosToLoad &&
+        parameters.pageToken != null);
+
+    } catch (err) {
+        // If the error is a StatusCodeError, it contains an error.error object that
+        // should be returned. It has a name, statuscode and message in the correct
+        // format. Otherwise extract the properties.
+        error = err.error.error ||
+            {name: err.name, code: err.statusCode, message: err.message};
+        winston.error(error);
+    }
+
+    winston.info('Search by text complete.');
+    return {photos, parameters, error};
 }
 
 // Returns a list of all albums owner by the logged in user from the Library
 // API.
 async function libraryApiGetAlbums(authToken) {
-  let albums = [];
-  let nextPageToken = null;
-  let error = null;
-  let parameters = {pageSize: config.albumPageSize};
+    let albums = [];
+    let nextPageToken = null;
+    let error = null;
+    let parameters = {pageSize: config.albumPageSize};
 
-  try {
-    // Loop while there is a nextpageToken property in the response until all
-    // albums have been listed.
-    do {
-      winston.verbose(`Loading albums. Received so far: ${albums.length}`);
-      // Make a GET request to load the albums with optional parameters (the
-      // pageToken if set).
-      const result = await request.get(config.apiEndpoint + '/v1/albums', {
-        headers: {'Content-Type': 'application/json'},
-        qs: parameters,
-        json: true,
-        auth: {'bearer': authToken},
-      });
+    try {
+        // Loop while there is a nextpageToken property in the response until all
+        // albums have been listed.
+        do {
+            winston.verbose(`Loading albums. Received so far: ${albums.length}`);
+            // Make a GET request to load the albums with optional parameters (the
+            // pageToken if set).
+            const result = await request.get(config.apiEndpoint + '/v1/albums', {
+                headers: {'Content-Type': 'application/json'},
+                qs: parameters,
+                json: true,
+                auth: {'bearer': authToken},
+            });
 
-      winston.debug(`Response: ${result}`);
+            winston.debug(`Response: ${result}`);
 
-      if (result && result.albums) {
-        winston.verbose(`Number of albums received: ${result.albums.length}`);
-        // Parse albums and add them to the list, skipping empty entries.
-        const items = result.albums.filter(x => !!x);
+            if (result && result.albums) {
+                winston.verbose(`Number of albums received: ${result.albums.length}`);
+                // Parse albums and add them to the list, skipping empty entries.
+                const items = result.albums.filter(x => !!x);
 
-        albums = albums.concat(items);
-      }
-      parameters.pageToken = result.nextPageToken;
-      // Loop until all albums have been listed and no new nextPageToken is
-      // returned.
-    } while (parameters.pageToken != null);
+                albums = albums.concat(items);
+            }
+            parameters.pageToken = result.nextPageToken;
+            // Loop until all albums have been listed and no new nextPageToken is
+            // returned.
+        } while (parameters.pageToken != null);
 
-  } catch (err) {
-    // If the error is a StatusCodeError, it contains an error.error object that
-    // should be returned. It has a name, statuscode and message in the correct
-    // format. Otherwise extract the properties.
-    error = err.error.error ||
-        {name: err.name, code: err.statusCode, message: err.message};
-    winston.error(error);
-  }
+    } catch (err) {
+        // If the error is a StatusCodeError, it contains an error.error object that
+        // should be returned. It has a name, statuscode and message in the correct
+        // format. Otherwise extract the properties.
+        error = err.error.error ||
+            {name: err.name, code: err.statusCode, message: err.message};
+        winston.error(error);
+    }
 
-  winston.info('Albums loaded.');
-  return {albums, error};
+    winston.info('Albums loaded.');
+    return {albums, error};
 }
-
-
 
 
 async function createUser(username) {
-  console.log('createUser::' + username);
+    console.log('createUser::' + username);
 
-  const user_check = await getUser(username);
-  if (user_check.length >= 1) {
-    console.log('User already exist. Not creating');
-    return ;
-  }
+    const user_check = await getUser(username);
+    if (user_check.length >= 1) {
+        console.log('User already exist. Not creating');
+        return;
+    }
 
-  console.log('Add new user');
-  const user = new User({
-      username
-   });
+    console.log('Add new user');
+    const user = new User({
+        username
+    });
 
-   try {
-      const result = await user.save();
-      console.log(result);
-   } catch(ex){
-      console.log(ex.message);
-   }
+    try {
+        const result = await user.save();
+        console.log(result);
+    } catch (ex) {
+        console.log(ex.message);
+    }
 }
 
 async function getUsers() {
-  console.log('getUsers::');
-  const users = await User.find()
-  console.log(users);
-  return users;
+    console.log('getUsers::');
+    const users = await User.find()
+    console.log(users);
+    return users;
 }
 
 async function getUser(username) {
-  console.log('getUser(id)::');
-  const user = await User.find( { username: username } )
-  console.log(user);
-  return user;
+    console.log('getUser(id)::');
+    const user = await User.find({username: username})
+    console.log(user);
+    return user;
 }
 
 async function removeUser(username) {
-  console.log('removeUser(username)::');
-  const result = await User.deleteOne( { username: username } );
-  console.log(result);
+    console.log('removeUser(username)::');
+    const result = await User.deleteOne({username: username});
+    console.log(result);
 }
 
 
+async function createPicture(idInGooglePhoto, username, publicUrl, baseUrl, ExtractTextAndLabelText) {
+    console.log('createPicture::');
 
-async function createPicture(idInGooglePhoto, username, publicUrl, baseUrl, googleApiResponseJSON ) {
-  console.log('createPicture::');
+    // const text_arr = phaseTextExtractResponseJSON(googleApiResponseJSON);
+    // If no text in picture, do not save it in DB
+    if (!ExtractTextAndLabelText)
+        return;
 
-  const text_arr = phaseGoogleApiResponseJSON(googleApiResponseJSON);
-  // If no text in picture, do not save it in DB
-  if (!text_arr) 
-    return ;
+    // Check if exist
+    const img_check = await getPictureById(idInGooglePhoto);
+    if (img_check.length >= 1) {
+        console.log('Picture already exist. Not creating');
+        return;
+    }
 
-  // Check if exist
-  const img_check = await getPictureById(idInGooglePhoto);
-  if (img_check.length >= 1) {
-    console.log('Picture already exist. Not creating');
-    return ;
-  }
+    console.log('Picture not exist. Creating');
+    const pic = new Picture({
+        idInGooglePhoto,
+        username,
+        publicUrl,
+        baseUrl,
+        texts: ExtractTextAndLabelText
+    });
 
-  console.log('Picture not exist. Creating');
-  const pic = new Picture({
-      idInGooglePhoto,
-      username,
-      publicUrl,
-      baseUrl,
-      texts: text_arr
-   });
-   
-   try {
-     // Save pic object save into DB.
-      const result = await pic.save();
-      console.log('Pciture Saved');
-      // console.log(result);
-   } catch(ex){
-      console.log(ex.message);
-   }
+    try {
+        // Save pic object save into DB.
+        const result = await pic.save();
+        console.log('Picture Saved');
+        // console.log(result);
+    } catch (ex) {
+        console.log(ex.message);
+    }
 }
 
 async function getPicturesAll() {
-  console.log('getPicturesAll::');
-  const pics = await Picture.find()
-  console.log(pics);
-  return pics;
+    console.log('getPicturesAll::');
+    const pics = await Picture.find()
+    console.log(pics);
+    return pics;
 }
 
 async function getPicturesByUsername(username) {
-  console.log('getPicturesByUsername(username)::');
-  const pics = await Picture.find( { username: username } )
-  console.log(pics);
-  return pics;
+    console.log('getPicturesByUsername(username)::');
+    const pics = await Picture.find({username: username})
+    console.log(pics);
+    return pics;
 }
 
 async function getPicturesByUsernameAndText(username, text) {
-  console.log('getPicturesByUsernameAndText(username, text)::');
-  const pics = await Picture.find( { username: username, texts: text.toLowerCase() } )
-  // console.log(pics);
-  var array_googleImageId = pics.map(a => a.idInGooglePhoto);
-  return array_googleImageId;
+    console.log('getPicturesByUsernameAndText(username, text)::');
+    const pics = await Picture.find({username: username, texts: text.toLowerCase()})
+    // console.log(pics);
+    var array_googleImageId = pics.map(a => a.idInGooglePhoto);
+    return array_googleImageId;
 }
 
 async function getPictureById(idInGooglePhoto) {
-  console.log('getPictureById(idInGooglePhoto)::');
-  const pics = await Picture.find( { idInGooglePhoto: idInGooglePhoto } )
-  return pics;
+    console.log('getPictureById(idInGooglePhoto)::');
+    const pics = await Picture.find({idInGooglePhoto: idInGooglePhoto})
+    return pics;
 }
 
 async function removePicturesById(idInGooglePhoto) {
-  console.log('removePicturesById(idInGooglePhoto)::');
-  const result = await Picture.deleteOne( { idInGooglePhoto: idInGooglePhoto } );
-  console.log(result);
+    console.log('removePicturesById(idInGooglePhoto)::');
+    const result = await Picture.deleteOne({idInGooglePhoto: idInGooglePhoto});
+    console.log(result);
 }
 
 
-function phaseGoogleApiResponseJSON(googleApiResponseJSON) {
-  // console.log(googleApiResponseJSON);
-  if (googleApiResponseJSON === undefined || googleApiResponseJSON.length == 0) {
-    console.log('googleApiResponseJSON = empty');
-    return [];
-  }
-  if(!googleApiResponseJSON) {
-      console.log('googleApiResponseJSON = null');
-      return ;
-  }
-  if(!googleApiResponseJSON[0].description) {
-      console.log('googleApiResponseJSON[0].description = null');
-      return ;
-  }
-  const toLower = function(x){
-      return x.toLowerCase();
-  };
-  const text_arr = googleApiResponseJSON[0].description.split(/[\s,]+/).map(toLower).filter(Boolean);
-  return text_arr;
+function phaseTextExtractResponseJSON(ExtractTextResponseJSON) {
+    //console.log('extractTextResponse Json is:'+ JSON.stringify(ExtractTextResponseJSON));
+    if (ExtractTextResponseJSON === undefined || ExtractTextResponseJSON.length == 0) {
+        console.log('googleApiResponseJSON = empty');
+        return [];
+    }
+    if (!ExtractTextResponseJSON) {
+        console.log('googleApiResponseJSON = null');
+        return;
+    }
+    if (!ExtractTextResponseJSON[0].description) {
+        console.log('googleApiResponseJSON[0].description = null');
+        return;
+    }
+    const toLower = function (x) {
+        return x.toLowerCase();
+    };
+
+    const text_arr = ExtractTextResponseJSON[0].description.split(/[\s,]+/).map(toLower).filter(Boolean);
+    console.log('text_arr is ' + text_arr.toString());
+    return text_arr;
+}
+
+function phaseLabelDetectionResponseJSON(LabelDetectionResponseJSON) {
+    //console.log('labelDetectionJSON is:' + JSON.stringify(LabelDetectionResponseJSON));
+    const THRESHOLD = 0.9;
+    var label_arr = '';
+    for (var i = 0; i < LabelDetectionResponseJSON.length; i++) {
+        console.log(i + "th score is:" + LabelDetectionResponseJSON[i].score,
+            "description is:" + LabelDetectionResponseJSON[i].description);
+        if (LabelDetectionResponseJSON[i].score >= THRESHOLD) {
+            label_arr += LabelDetectionResponseJSON[i].description + ',';
+        }
+    }
+    console.log("after filter by score, label_arr is:" + label_arr);
+    return label_arr;
 }
 
 // [END app]
