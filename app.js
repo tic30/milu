@@ -529,6 +529,7 @@ app.post(
             // res.status(200).send(detections);
             // res.status(200).send(data.imageUrl);
 
+            // add one function which has threadhold;
             const text_arr = phaseGoogleApiResponseJSON(detections);
             res.render('pages/picture_v2', {
               imgurl: data.imageUrl,
@@ -896,6 +897,7 @@ async function createPicture(idInGooglePhoto, username, publicUrl, baseUrl, goog
    });
    
    try {
+     // Save pic object save into DB.
       const result = await pic.save();
       console.log('Pciture Saved');
       // console.log(result);
