@@ -48,7 +48,10 @@ const bucket = gcstorage.bucket(CLOUD_BUCKET);
 // Rico :: DB
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/ccproject2')
+// 'mongodb://user:pass@host:port/db';
+var mongodbUri = 'mongodb://liangyifan:fan1985FAN@ds249311.mlab.com:49311/ccproject2';
+
+mongoose.connect(mongodbUri)
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => console.log('Could not connect to DB...', err))
 
