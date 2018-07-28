@@ -57,11 +57,11 @@ const userSchema = new mongoose.Schema({
 })
 
 const pictureSchema = new mongoose.Schema({
-    idInGooglePhoto: String,
-    username: String,
-    publicUrl: String,
-    baseUrl: String,
-    texts: [String]
+    idInGooglePhoto:    String,
+    username:           String,
+    publicUrl:          String,
+    baseUrl:            String,
+    texts:              [String]
 })
 
 const User = mongoose.model('User', userSchema);
@@ -145,6 +145,7 @@ if (process.env.DEBUG) {
 }
 
 
+
 // Set up static routes for hosted libraries.
 app.use(express.static('static'));
 app.use('/js', express.static(__dirname + '/node_modules/jquery/dist/'));
@@ -154,6 +155,7 @@ app.use(
 app.use(
     '/mdlite',
     express.static(__dirname + '/node_modules/material-design-lite/dist/'));
+
 
 
 // Parse application/json request data.
@@ -190,7 +192,7 @@ app.use((req, res, next) => {
 // Display the login screen if the user is not logged in yet, otherwise the
 // photo frame.
 app.get('/', (req, res) => {
-    winston.log('req.user::' + req.user);
+    winston.log('req.user::'+req.user);
     // 20180710 Rico:: Rightnow, !req.user always = True, since req.user = null
     if (!req.user || !req.isAuthenticated()) {
         // Not logged in yet.
@@ -229,7 +231,7 @@ app.get(
     (req, res) => {
         // User has logged in.
         winston.info('User has Auth and will log in.');
-        winston.info('req.isAuthenticated()::' + req.isAuthenticated());
+        winston.info('req.isAuthenticated()::'+req.isAuthenticated());
 
         res.redirect('/');
     });
@@ -298,7 +300,7 @@ app.post('/loadFromSearch', async (req, res) => {
 
     // Submit the search request to the API and wait for the result.
     const data = await libraryApiSearch(authToken, parameters);
-    winston.info('filter::data: ' + +JSON.stringify(parameters));
+    winston.info('filter::data: ' + + JSON.stringify(parameters));
 
     // Return and cache the result and parameters.
     const userId = req.user.profile.id;
@@ -323,11 +325,10 @@ app.post('/loadScanAll', async (req, res) => {
     const userId = req.user.profile.id;
     createUser(userId);
 
-    var extractText = '';
-    var labelText = '';
-
     const client = new vision.ImageAnnotatorClient();
-    (data.photos).forEach(function (value) {
+    (data.photos).forEach(function(value){
+        var extractText = '';
+        var labelText = '';
 
         client
             .textDetection(value.baseUrl)
@@ -351,11 +352,11 @@ app.post('/loadScanAll', async (req, res) => {
                         //     imgurl: data.imageUrl,
                         //     para: extractText +','+ labelText
                         // });
-                        winston.info(' extractText + labelText is:'+extractText +','+ labelText);
+                        winston.info(' extractText + labelText is:' + extractText + ',' + labelText);
 
                         // Save JSON to DB
                         winston.info("start to Save Image and Text Into MongoDB");
-                        createPicture(value.id, userId, fullImgUrl, value.baseUrl, extractText +','+ labelText);
+                        createPicture(value.id, userId, fullImgUrl, value.baseUrl, extractText + ',' + labelText);
                         winston.info("End DB Save!");
                     })
             })
@@ -374,8 +375,8 @@ app.post('/loadFind', async (req, res) => {
 
     winston.info('Loading images from search.');
     winston.info('??????? Received form data: ', req.body);
-    winston.info('????? ::req.body: ' + JSON.stringify(req.body));
-    winston.info('????? ::req.box: ' + req.body.button_3_searchbox);
+    winston.info('????? ::req.body: '+ JSON.stringify(req.body));
+    winston.info('????? ::req.box: '+ req.body.button_3_searchbox);
 
     const input_search_text = req.body.button_3_searchbox;
 
@@ -509,113 +510,111 @@ const multer1 = multer({
 
 app.post(
     '/uploadImg',
-    multer1.single('pic'),
-    sendUploadToGCS,
-    (req, res, next) => {
-        let data = req.body;
+    multer1.any('pics'),
 
-        // Was an image uploaded? If so, we'll use its public URL
-        // in cloud storage.
-        if (req.file && req.file.cloudStoragePublicUrl) {
-            data.imageUrl = req.file.cloudStoragePublicUrl;
-            console.log("Image uploaded to bucket. url: " + data.imageUrl);
+    function (req, res) {
+        processFiles(req.files, function (publicURLs) {
+            console.log("processed all files, get ready to return, in callback");
+            console.log(publicURLs);
 
-
-        } else {
-            console.log("Image uploaded to bucket fail");
-            res.status(206).send({});
-        }
-
-
-        // 20180709 Rico:
-        // Add Zhanghe's Google Vision API call code
-        // Input:   image url from bucket
-        // Output:  JSON response. Then pass to Rico's DB function
-        // ...
-
-        // Imports the Google Cloud client library
-        const client = new vision.ImageAnnotatorClient();
-        var extractText = '';
-        var labelText = '';
-        client
-            .textDetection(data.imageUrl)
-            .then(results => {
-                const extractTextResponse = results[0].textAnnotations;
-                console.log('Text OCR Done');
-                // detections.forEach(text => console.log(text));
-                // const fullImgUrl = data.imageUrl;
-                // FIXME :: googleImgId ?, userId ?
-                // Rico :: Save to DB
-                // createPicture(value.id, userId, fullImgUrl, data.imageUrl, detections);
-                // res.status(200).send(detections);
-                // res.status(200).send(data.imageUrl);
-
-                // add one function which has threadhold;
-                extractText = phaseTextExtractResponseJSON(extractTextResponse);
-                console.log('in client call, extractText is:' + extractText);
-
-                // Make Label Detection call;
-                client
-                    .labelDetection(data.imageUrl)
-                    .then(results => {
-                        const labelsResponse = results[0].labelAnnotations;
-                        console.log('Label Detection Done');
-
-                        labelText = phaseLabelDetectionResponseJSON(labelsResponse);
-                        console.log("in client call, labelText is:" + labelText);
-
-                        res.render('pages/picture_v2', {
-                            imgurl: data.imageUrl,
-                            para: extractText +','+ labelText
-                        });
-                        console.log(' extractText + labelText is:'+extractText +','+ labelText);
-                    })
-
-                // FIXME 然后显示什么页面呢？
-            })
-            .catch(err => {
-                console.error('ERROR:', err);
+            res.render('pages/picture_v2', {
+                //imgurl: "https://storage.googleapis.com/milu-resources/1532416499328_House_sparrow04.jpg",
+                //para: "bird"
+                urlsAndTexts: publicURLs
             });
+        });
     }
+
 );
 
-
-function getPublicUrl(filename) {
+function getPublicUrl (filename) {
     return `https://storage.googleapis.com/${CLOUD_BUCKET}/${filename}`;
 }
 
-function sendUploadToGCS(req, res, next) {
-    if (!req.file) {
-        return next();
-    }
+function processFiles(files, callback) {
+    var publicURLs = {};
 
-    const gcsname = Date.now() + '_' + req.file.originalname;
-    const file = bucket.file(gcsname);
+    files.forEach(function (fileName, index) {
+        const gcsname = Date.now() + '_' + fileName.originalname;
+        const file = bucket.file(gcsname);
 
-    const stream = file.createWriteStream({
-        metadata: {
-            contentType: req.file.mimetype
-        },
-        resumable: false
-    });
-
-    stream.on('error', (err) => {
-        req.file.cloudStorageError = err;
-        next(err);
-    });
-
-    stream.on('finish', () => {
-        req.file.cloudStorageObject = gcsname;
-        file.makePublic().then(() => {
-            req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
-            next();
+        const stream = file.createWriteStream({
+            metadata: {
+                contentType: fileName.mimetype
+            },
+            resumable: false
         });
+
+        stream.on('error', (err) => {
+            console.error(err);
+        });
+
+        stream.on('finish', () => {
+            file.makePublic().then(() => {
+                var url = getPublicUrl(gcsname);
+                //console.log(getPublicUrl(url));
+
+                // 20180709 Rico:
+                // Add Zhanghe's Google Vision API call code
+                // Input:   image url from bucket
+                // Output:  JSON response. Then pass to Rico's DB function
+                // ...
+
+                // Imports the Google Cloud client library
+                const client = new vision.ImageAnnotatorClient();
+                var extractText = '';
+                var labelText = '';
+                client
+                    .textDetection(url)
+                    .then(results => {
+                        const extractTextResponse = results[0].textAnnotations;
+                        console.log('Text OCR Done');
+                        // detections.forEach(text => console.log(text));
+                        // const fullImgUrl = data.imageUrl;
+                        // FIXME :: googleImgId ?, userId ?
+                        // Rico :: Save to DB
+                        // createPicture(value.id, userId, fullImgUrl, data.imageUrl, detections);
+                        // res.status(200).send(detections);
+                        // res.status(200).send(data.imageUrl);
+
+                        extractText = phaseTextExtractResponseJSON(extractTextResponse);
+                        console.log('in client call, extractText is:' + extractText);
+
+                        // Make Lable Detection call;
+                        client
+                            .labelDetection(url)
+                            .then(results => {
+                                const labelsResponse = results[0].labelAnnotations;
+                                console.log('Label Detection Done');
+
+                                labelText = phaseLabelDetectionResponseJSON(labelsResponse);
+                                console.log("in client call, labelText is:" + labelText);
+
+                                // res.render('pages/picture_v2', {
+                                //     imgurl: data.imageUrl,
+                                //     para: extractText + ',' + labelText
+                                // });
+                                console.log(' extractText + labelText is:' + extractText + ',' + labelText);
+                                publicURLs[url] = extractText + ',' + labelText ;
+
+                                if (index === files.length - 1) {
+                                    callback(publicURLs);
+                                }
+                            })
+                        // FIXME
+                    })
+                    .catch(err => {
+                        console.error('ERROR:', err);
+                    });
+
+            });
+        });
+
+        stream.end(fileName.buffer);
     });
-
-    stream.end(req.file.buffer);
 }
-
 // [END process]
+
 
 
 // Start the server
@@ -859,13 +858,15 @@ async function libraryApiGetAlbums(authToken) {
 }
 
 
+
+
 async function createUser(username) {
     console.log('createUser::' + username);
 
     const user_check = await getUser(username);
     if (user_check.length >= 1) {
         console.log('User already exist. Not creating');
-        return;
+        return ;
     }
 
     console.log('Add new user');
@@ -876,7 +877,7 @@ async function createUser(username) {
     try {
         const result = await user.save();
         console.log(result);
-    } catch (ex) {
+    } catch(ex){
         console.log(ex.message);
     }
 }
@@ -890,16 +891,17 @@ async function getUsers() {
 
 async function getUser(username) {
     console.log('getUser(id)::');
-    const user = await User.find({username: username})
+    const user = await User.find( { username: username } )
     console.log(user);
     return user;
 }
 
 async function removeUser(username) {
     console.log('removeUser(username)::');
-    const result = await User.deleteOne({username: username});
+    const result = await User.deleteOne( { username: username } );
     console.log(result);
 }
+
 
 
 async function createPicture(idInGooglePhoto, username, publicUrl, baseUrl, ExtractTextAndLabelText) {
@@ -945,14 +947,14 @@ async function getPicturesAll() {
 
 async function getPicturesByUsername(username) {
     console.log('getPicturesByUsername(username)::');
-    const pics = await Picture.find({username: username})
+    const pics = await Picture.find( { username: username } )
     console.log(pics);
     return pics;
 }
 
 async function getPicturesByUsernameAndText(username, text) {
     console.log('getPicturesByUsernameAndText(username, text)::');
-    const pics = await Picture.find({username: username, texts: text.toLowerCase()})
+    const pics = await Picture.find( { username: username, texts: text.toLowerCase() } )
     // console.log(pics);
     var array_googleImageId = pics.map(a => a.idInGooglePhoto);
     return array_googleImageId;
@@ -960,16 +962,15 @@ async function getPicturesByUsernameAndText(username, text) {
 
 async function getPictureById(idInGooglePhoto) {
     console.log('getPictureById(idInGooglePhoto)::');
-    const pics = await Picture.find({idInGooglePhoto: idInGooglePhoto})
+    const pics = await Picture.find( { idInGooglePhoto: idInGooglePhoto } )
     return pics;
 }
 
 async function removePicturesById(idInGooglePhoto) {
     console.log('removePicturesById(idInGooglePhoto)::');
-    const result = await Picture.deleteOne({idInGooglePhoto: idInGooglePhoto});
+    const result = await Picture.deleteOne( { idInGooglePhoto: idInGooglePhoto } );
     console.log(result);
 }
-
 
 function phaseTextExtractResponseJSON(ExtractTextResponseJSON) {
     //console.log('extractTextResponse Json is:'+ JSON.stringify(ExtractTextResponseJSON));
