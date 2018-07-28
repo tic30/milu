@@ -491,71 +491,20 @@ const multer1 = multer({
 app.post(
   '/uploadImg',
   multer1.any('pics'),
-  sendUploadToGCS,
-  (req, res, next) => {
-        //var results = JSON.parse(next);
 
+  function (req, res) {
+      processFiles(req.files, function (publicURLs) {
+          console.log("processed all files, get ready to return, in callback");
+          console.log(publicURLs);
 
-        //res.status(200).send("tesat");
-
-
-        res.render('pages/picture_v2', {
-            imgurl: "https://storage.googleapis.com/milu-resources/1532416499328_House_sparrow04.jpg",
-            para: "bird"
-        });
+          res.render('pages/picture_v2', {
+              //imgurl: "https://storage.googleapis.com/milu-resources/1532416499328_House_sparrow04.jpg",
+              //para: "bird"
+              urlsAndTexts: publicURLs
+          });
+      });
   }
 
-    /*
-    (req, res, next) => {
-      let data = req.body;
-
-      // Was an image uploaded? If so, we'll use its public URL
-      // in cloud storage.
-      if (req.file && req.file.cloudStoragePublicUrl) {
-        data.imageUrl = req.file.cloudStoragePublicUrl;
-        console.log("Image uploaded to bucket. url: " + data.imageUrl);
-
-
-      } else {
-        console.log("Image uploaded to bucket fail");
-        res.status(206).send({});
-      }
-
-
-      // 20180709 Rico:
-      // Add Zhanghe's Google Vision API call code
-      // Input:   image url from bucket
-      // Output:  JSON response. Then pass to Rico's DB function
-      // ...
-
-      // Imports the Google Cloud client library
-      const client = new vision.ImageAnnotatorClient();
-      client
-          .textDetection(data.imageUrl)
-          .then(results => {
-              const detections = results[0].textAnnotations;
-              console.log('Text OCR Done');
-              // detections.forEach(text => console.log(text));
-              // const fullImgUrl = data.imageUrl;
-              // FIXME :: googleImgId ?, userId ?
-              // Rico :: Save to DB
-              // createPicture(value.id, userId, fullImgUrl, data.imageUrl, detections);
-              // res.status(200).send(detections);
-              // res.status(200).send(data.imageUrl);
-
-              const text_arr = phaseGoogleApiResponseJSON(detections);
-              res.render('pages/picture_v2', {
-                imgurl: data.imageUrl,
-                para: text_arr
-            });
-
-              // FIXME 然后显示什么页面呢？
-          })
-          .catch(err => {
-              console.error('ERROR:', err);
-          });
-    }
-    */
 );
 
 
@@ -587,7 +536,7 @@ function processFiles(files, callback) {
         stream.on('finish', () => {
             file.makePublic().then(() => {
               var url = getPublicUrl(gcsname);
-              console.log(getPublicUrl(url));
+              //console.log(getPublicUrl(url));
 
               // 20180709 Rico:
               // Add Zhanghe's Google Vision API call code
@@ -601,7 +550,7 @@ function processFiles(files, callback) {
                   .textDetection(url)
                   .then(results => {
                       const detections = results[0].textAnnotations;
-                      console.log('Text OCR Done');
+                      //console.log('Text OCR Done');
                       // detections.forEach(text => console.log(text));
                       // const fullImgUrl = data.imageUrl;
                       // FIXME :: googleImgId ?, userId ?
@@ -611,19 +560,13 @@ function processFiles(files, callback) {
                       // res.status(200).send(data.imageUrl);
 
                       const text_arr = phaseGoogleApiResponseJSON(detections);
-                      console.log(text_arr);
+                      //console.log(text_arr);
 
                       publicURLs[url] = text_arr;
-                      /*
-                      res.render('pages/picture_v2', {
-                          imgurl: url,
-                          para: text_arr
-                      });
-                      */
 
 
                       if (index === files.length - 1) {
-                          callback("sdafsdf");
+                          callback(publicURLs);
                       }
                       // FIXME
                   })
@@ -636,16 +579,6 @@ function processFiles(files, callback) {
 
         stream.end(fileName.buffer);
     });
-}
-
-function sendUploadToGCS (req, res, next) {
-
-  processFiles(req.files, function (publicURLs) {
-    console.log("processed all files, get ready to return, in callback");
-    console.log(req);
-    return next();
-  });
-
 }
 // [END process]
 
