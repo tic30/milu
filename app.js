@@ -483,64 +483,28 @@ app.get('/getQueue', async (req, res) => {
 const multer1 = multer({
   storage: multer.MemoryStorage,
   limits: {
-    fileSize: 15 * 1024 * 1024 // no larger than 5mb
+    fileSize: 1500 * 1024 * 1024 // no larger than 5mb
   }
 });
 // [END multer]
 
 app.post(
   '/uploadImg',
-  multer1.single('pic'),
-  sendUploadToGCS,
-  (req, res, next) => {
-    let data = req.body;
+  multer1.any('pics'),
 
-    // Was an image uploaded? If so, we'll use its public URL
-    // in cloud storage.
-    if (req.file && req.file.cloudStoragePublicUrl) {
-      data.imageUrl = req.file.cloudStoragePublicUrl;
-      console.log("Image uploaded to bucket. url: " + data.imageUrl);
+  function (req, res) {
+      processFiles(req.files, function (publicURLs) {
+          console.log("processed all files, get ready to return, in callback");
+          console.log(publicURLs);
 
-
-    } else {
-      console.log("Image uploaded to bucket fail");
-      res.status(206).send({});
-    }
-
-
-    // 20180709 Rico:
-    // Add Zhanghe's Google Vision API call code
-    // Input:   image url from bucket
-    // Output:  JSON response. Then pass to Rico's DB function
-    // ...
-
-    // Imports the Google Cloud client library
-    const client = new vision.ImageAnnotatorClient();
-    client
-        .textDetection(data.imageUrl)
-        .then(results => {
-            const detections = results[0].textAnnotations;
-            console.log('Text OCR Done');
-            // detections.forEach(text => console.log(text));
-            // const fullImgUrl = data.imageUrl;
-            // FIXME :: googleImgId ?, userId ? 
-            // Rico :: Save to DB
-            // createPicture(value.id, userId, fullImgUrl, data.imageUrl, detections);
-            // res.status(200).send(detections);
-            // res.status(200).send(data.imageUrl);
-
-            const text_arr = phaseGoogleApiResponseJSON(detections);
-            res.render('pages/picture_v2', {
-              imgurl: data.imageUrl,
-              para: text_arr
+          res.render('pages/picture_v2', {
+              //imgurl: "https://storage.googleapis.com/milu-resources/1532416499328_House_sparrow04.jpg",
+              //para: "bird"
+              urlsAndTexts: publicURLs
           });
-
-            // FIXME 然后显示什么页面呢？
-        })
-        .catch(err => {
-            console.error('ERROR:', err);
-        });
+      });
   }
+
 );
 
 
@@ -550,35 +514,71 @@ function getPublicUrl (filename) {
   return `https://storage.googleapis.com/${CLOUD_BUCKET}/${filename}`;
 }
 
-function sendUploadToGCS (req, res, next) {
-  if (!req.file) {
-    return next();
-  }
 
-  const gcsname = Date.now() + '_' + req.file.originalname;
-  const file = bucket.file(gcsname);
+function processFiles(files, callback) {
+    var publicURLs = {};
 
-  const stream = file.createWriteStream({
-    metadata: {
-      contentType: req.file.mimetype
-    },
-    resumable: false
-  });
+    files.forEach(function (fileName, index) {
+        const gcsname = Date.now() + '_' + fileName.originalname;
+        const file = bucket.file(gcsname);
 
-  stream.on('error', (err) => {
-    req.file.cloudStorageError = err;
-    next(err);
-  });
+        const stream = file.createWriteStream({
+            metadata: {
+                contentType: fileName.mimetype
+            },
+            resumable: false
+        });
 
-  stream.on('finish', () => {
-    req.file.cloudStorageObject = gcsname;
-    file.makePublic().then(() => {
-      req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
-      next();
+        stream.on('error', (err) => {
+            console.error(err);
+        });
+
+        stream.on('finish', () => {
+            file.makePublic().then(() => {
+              var url = getPublicUrl(gcsname);
+              //console.log(getPublicUrl(url));
+
+              // 20180709 Rico:
+              // Add Zhanghe's Google Vision API call code
+              // Input:   image url from bucket
+              // Output:  JSON response. Then pass to Rico's DB function
+              // ...
+
+              // Imports the Google Cloud client library
+              const client = new vision.ImageAnnotatorClient();
+              client
+                  .textDetection(url)
+                  .then(results => {
+                      const detections = results[0].textAnnotations;
+                      //console.log('Text OCR Done');
+                      // detections.forEach(text => console.log(text));
+                      // const fullImgUrl = data.imageUrl;
+                      // FIXME :: googleImgId ?, userId ?
+                      // Rico :: Save to DB
+                      // createPicture(value.id, userId, fullImgUrl, data.imageUrl, detections);
+                      // res.status(200).send(detections);
+                      // res.status(200).send(data.imageUrl);
+
+                      const text_arr = phaseGoogleApiResponseJSON(detections);
+                      //console.log(text_arr);
+
+                      publicURLs[url] = text_arr;
+
+
+                      if (index === files.length - 1) {
+                          callback(publicURLs);
+                      }
+                      // FIXME
+                  })
+                  .catch(err => {
+                      console.error('ERROR:', err);
+                  });
+
+            });
+        });
+
+        stream.end(fileName.buffer);
     });
-  });
-
-  stream.end(req.file.buffer);
 }
 // [END process]
 
