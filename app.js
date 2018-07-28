@@ -906,8 +906,6 @@ async function removeUser(username) {
 
 async function createPicture(idInGooglePhoto, username, publicUrl, baseUrl, ExtractTextAndLabelText) {
     console.log('createPicture::');
-
-    // const text_arr = phaseTextExtractResponseJSON(googleApiResponseJSON);
     // If no text in picture, do not save it in DB
     if (!ExtractTextAndLabelText)
         return;
@@ -975,15 +973,15 @@ async function removePicturesById(idInGooglePhoto) {
 function phaseTextExtractResponseJSON(ExtractTextResponseJSON) {
     //console.log('extractTextResponse Json is:'+ JSON.stringify(ExtractTextResponseJSON));
     if (ExtractTextResponseJSON === undefined || ExtractTextResponseJSON.length == 0) {
-        console.log('googleApiResponseJSON = empty');
+        console.log('ExtractTextResponseJSON = empty');
         return [];
     }
     if (!ExtractTextResponseJSON) {
-        console.log('googleApiResponseJSON = null');
+        console.log('ExtractTextResponseJSON = null');
         return;
     }
     if (!ExtractTextResponseJSON[0].description) {
-        console.log('googleApiResponseJSON[0].description = null');
+        console.log('ExtractTextResponseJSON[0].description = null');
         return;
     }
     const toLower = function (x) {
