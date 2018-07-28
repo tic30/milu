@@ -7,9 +7,12 @@
   "author": "Google LLC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/googlesamples/google-photos.git"
+    "url": "git+https://github.com/googlesamples/google-photos.git"
   },
   "main": "app.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "@fancyapps/fancybox": "^3.3.5",
     "@google-cloud/pubsub": "0.13.2",
@@ -38,5 +41,13 @@
     "request-promise": "^4.2.2",
     "session-file-store": "^1.2.0",
     "winston": "^2.4.2"
-  }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/googlesamples/google-photos/issues"
+  },
+  "homepage": "https://github.com/googlesamples/google-photos#readme",
+  "devDependencies": {}
 }
