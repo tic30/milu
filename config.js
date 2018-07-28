@@ -24,7 +24,8 @@ config.oAuthclientSecret = 'H1AXhfprUln41OPLe41zz_4e';
 
 // The callback to use for OAuth requests. This is the URL where the app is
 // running. For testing and running it locally, use 127.0.0.1.
-config.oAuthCallbackUrl = 'http://127.0.0.1:8080/auth/google/callback';
+// config.oAuthCallbackUrl = 'http://127.0.0.1:8080/auth/google/callback';
+config.oAuthCallbackUrl = 'https://ocrproject-208817.appspot.com/auth/google/callback';
 
 // The port where the app should listen for requests.
 config.port = 8080;
