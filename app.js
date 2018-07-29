@@ -532,7 +532,7 @@ function getPublicUrl (filename) {
     return `https://storage.googleapis.com/${CLOUD_BUCKET}/${filename}`;
 }
 
-async function processFiles(files, callback) {
+function processFiles(files, callback) {
     var publicURLs = {};
     var counter = 0;
 
