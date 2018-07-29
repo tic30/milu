@@ -789,42 +789,37 @@ async function libraryApiGet(authToken, parameters, arr_img_id) {
     parameters.pageSize = config.searchPageSize;
 
     try {
+      let index = 0
+      do {
+        winston.info(`Submitting get with parameters: ${JSON.stringify(parameters)}`);
+        const result =
+            await request.get(config.apiEndpoint + '/v1/mediaItems/'+ arr_img_id[index], {
+                headers: {'Content-Type': 'application/json'},
+                auth: {'bearer': authToken},
+            });
+        
+        let items = [JSON.parse(result)];
+        photos = photos.concat(items);
 
-        do {
-            winston.info(`Submitting get with parameters: ${JSON.stringify(parameters)}`);
-            const result =
-                await request.post(config.apiEndpoint + '/v1/mediaItems:search', {
-                    headers: {'Content-Type': 'application/json'},
-                    json: parameters,
-                    auth: {'bearer': authToken},
-                });
+        // Set the pageToken for the next request.
+        parameters.pageToken = result.nextPageToken;
 
-            const items = result && result.mediaItems ?
-                result.mediaItems
-                    .filter(x => arr_img_id.includes(x.id)) :
-                [];
+        winston.verbose(
+            `Found ${items.length} images in this request. Total images: ${
+                photos.length}`);
 
-            photos = photos.concat(items);
-
-            // Set the pageToken for the next request.
-            parameters.pageToken = result.nextPageToken;
-
-            winston.verbose(
-                `Found ${items.length} images in this request. Total images: ${
-                    photos.length}`);
-
-            // Loop until the required number of photos has been loaded or until there
-            // are no more photos, ie. there is no pageToken.
-        } while (photos.length < config.photosToLoad &&
-        parameters.pageToken != null);
+        // Loop until the required number of photos has been loaded or until there
+        // are no more photos, ie. there is no pageToken.
+      } while (photos.length < config.photosToLoad &&
+              parameters.pageToken != null);
 
     } catch (err) {
-        // If the error is a StatusCodeError, it contains an error.error object that
-        // should be returned. It has a name, statuscode and message in the correct
-        // format. Otherwise extract the properties.
-        error = err.error.error ||
-            {name: err.name, code: err.statusCode, message: err.message};
-        winston.error(error);
+      // If the error is a StatusCodeError, it contains an error.error object that
+      // should be returned. It has a name, statuscode and message in the correct
+      // format. Otherwise extract the properties.
+      error = err.error.error ||
+          {name: err.name, code: err.statusCode, message: err.message};
+      winston.error(error);
     }
 
     winston.info('Search by text complete.');

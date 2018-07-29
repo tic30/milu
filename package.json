@@ -9,6 +9,9 @@
     "type": "git",
     "url": "https://github.com/googlesamples/google-photos.git"
   },
+  "scripts": {
+    "start": "node app.js"
+  },
   "main": "app.js",
   "dependencies": {
     "@fancyapps/fancybox": "^3.3.5",
