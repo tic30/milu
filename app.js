@@ -49,11 +49,10 @@ const bucket = gcstorage.bucket(CLOUD_BUCKET);
 const mongoose = require('mongoose');
 
 // 'mongodb://user:pass@host:port/db';
-// var mongodbUri = 'mongodb://liangyifan:fan1985FAN@ds249311.mlab.com:49311/ccproject2';
-// var mongodbUri = 'mongodb://liangyifan:fan1985FAN@ds249311.mlab.com:49311/ccproject2';
+var mongodbUri = 'mongodb://liangyifan:fan1985FAN@ds249311.mlab.com:49311/ccproject2';
 
-// mongoose.connect(mongodbUri)
-mongoose.connect('mongodb://localhost/ccproject2')
+mongoose.connect(mongodbUri)
+// mongoose.connect('mongodb://localhost/ccproject2')
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => console.log('Could not connect to DB...', err))
 
