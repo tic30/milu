@@ -17,10 +17,16 @@
 const config = {};
 
 // The OAuth client ID from the Google Developers console.
+// zhanghe client ID:
 config.oAuthClientID = '34545632361-hfqe7gc57lqa20o6s4glgjj11bb0k1fv.apps.googleusercontent.com';
+//Liangyi Client ID:
+// config.oAuthClientID = '689659281989-94egbqf1ge6r3i7g4r5licmkag92h1c3.apps.googleusercontent.com';
 
 // The OAuth client secret from the Google Developers console.
+//Zhanghe Password:
 config.oAuthclientSecret = 'S1uSswxmF1OYNQdKQ-LZG2Ya';
+// Liangyi Password:
+// config.oAuthclientSecret = 'H1AXhfprUln41OPLe41zz_4e';
 
 // The callback to use for OAuth requests. This is the URL where the app is
 // running. For testing and running it locally, use 127.0.0.1.
@@ -52,8 +58,14 @@ config.apiEndpoint = 'https://photoslibrary.googleapis.com';
 
 //config.GCLOUD_PROJECT = "ocr-test-by-tim";
 
+// Zhanghe Cloud bucket & project ID;
 config.CLOUD_BUCKET = "milu-resources";
 
 config.GCLOUD_PROJECT = "milu-209718";
+
+// Liangyi Cloud bucket & project ID;
+// config.CLOUD_BUCKET = "cmuocrimagebucket";
+//
+// config.GCLOUD_PROJECT = "ocrproject-208817";
 
 module.exports = config;
