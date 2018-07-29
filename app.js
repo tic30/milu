@@ -360,8 +360,9 @@ app.post('/loadScanAll', async (req, res) => {
                 extractText = phaseTextExtractResponseJSON(extractTextResponse);
                 const labelsResponse = results[0].labelAnnotations;
                 labelText = phaseLabelDetectionResponseJSON(labelsResponse);
-                // var detectionMsg = labelText + ',' + extractText;
+
                 var detectionMsg = labelText.concat(extractText);
+                detectionMsg = detectionMsg.filter(Boolean);
 
                 console.log(' extractText + labelText is:' + detectionMsg);
 
@@ -548,7 +549,7 @@ function processFiles(files, callback) {
     var counter = 0;
 
     files.forEach(function (fileName, index) {
-        const gcsname = Date.now() + '_' + fileName.originalname;
+        const gcsname = Date.now() + '_' + fileName.originalname.replace(/ /g,"_");
         const file = bucket.file(gcsname);
 
         const stream = file.createWriteStream({
@@ -624,8 +625,9 @@ function detection(url, callback) {
             extractText = phaseTextExtractResponseJSON(extractTextResponse);
             const labelsResponse = results[0].labelAnnotations;
             labelText = phaseLabelDetectionResponseJSON(labelsResponse);
-            // var detectionMsg = labelText + ',' + extractText;
+
             var detectionMsg = labelText.concat(extractText);
+            detectionMsg = detectionMsg.filter(Boolean);
 
             console.log(detectionMsg)
             callback(detectionMsg);
