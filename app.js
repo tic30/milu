@@ -733,21 +733,16 @@ async function libraryApiGet(authToken, parameters, arr_img_id) {
   parameters.pageSize = config.searchPageSize;
 
   try {
-   
+    let index = 0
     do {
       winston.info(`Submitting get with parameters: ${JSON.stringify(parameters)}`);
       const result =
-          await request.post(config.apiEndpoint + '/v1/mediaItems:search', {
-            headers: {'Content-Type': 'application/json'},
-            json: parameters,
-            auth: {'bearer': authToken},
+          await request.get(config.apiEndpoint + '/v1/mediaItems/'+ arr_img_id[index], {
+              headers: {'Content-Type': 'application/json'},
+              auth: {'bearer': authToken},
           });
-
-      const items = result && result.mediaItems ?
-          result.mediaItems
-              .filter(x => arr_img_id.includes(x.id)) :
-          [];
- 
+      
+      let items = [JSON.parse(result)];
       photos = photos.concat(items);
 
       // Set the pageToken for the next request.
