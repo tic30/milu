@@ -726,48 +726,48 @@ async function libraryApiSearch(authToken, parameters) {
 // as requested. This may result in more items being listed in the response than
 // originally requested.
 async function libraryApiGet(authToken, parameters, arr_img_id) {
-  let photos = [];
-  let nextPageToken = null;
-  let error = null;
+    let photos = [];
+    let nextPageToken = null;
+    let error = null;
 
-  parameters.pageSize = config.searchPageSize;
+    parameters.pageSize = config.searchPageSize;
 
-  try {
-    let index = 0
-    do {
-      winston.info(`Submitting get with parameters: ${JSON.stringify(parameters)}`);
-      const result =
-          await request.get(config.apiEndpoint + '/v1/mediaItems/'+ arr_img_id[index], {
-              headers: {'Content-Type': 'application/json'},
-              auth: {'bearer': authToken},
-          });
-      
-      let items = [JSON.parse(result)];
-      photos = photos.concat(items);
+    try {
+      let index = 0
+      do {
+        winston.info(`Submitting get with parameters: ${JSON.stringify(parameters)}`);
+        const result =
+            await request.get(config.apiEndpoint + '/v1/mediaItems/'+ arr_img_id[index], {
+                headers: {'Content-Type': 'application/json'},
+                auth: {'bearer': authToken},
+            });
+        
+        let items = [JSON.parse(result)];
+        photos = photos.concat(items);
 
-      // Set the pageToken for the next request.
-      parameters.pageToken = result.nextPageToken;
+        // Set the pageToken for the next request.
+        parameters.pageToken = result.nextPageToken;
 
-      winston.verbose(
-          `Found ${items.length} images in this request. Total images: ${
-              photos.length}`);
+        winston.verbose(
+            `Found ${items.length} images in this request. Total images: ${
+                photos.length}`);
 
-      // Loop until the required number of photos has been loaded or until there
-      // are no more photos, ie. there is no pageToken.
-    } while (photos.length < config.photosToLoad &&
-             parameters.pageToken != null);
+        // Loop until the required number of photos has been loaded or until there
+        // are no more photos, ie. there is no pageToken.
+      } while (photos.length < config.photosToLoad &&
+              parameters.pageToken != null);
 
-  } catch (err) {
-    // If the error is a StatusCodeError, it contains an error.error object that
-    // should be returned. It has a name, statuscode and message in the correct
-    // format. Otherwise extract the properties.
-    error = err.error.error ||
-        {name: err.name, code: err.statusCode, message: err.message};
-    winston.error(error);
-  }
+    } catch (err) {
+      // If the error is a StatusCodeError, it contains an error.error object that
+      // should be returned. It has a name, statuscode and message in the correct
+      // format. Otherwise extract the properties.
+      error = err.error.error ||
+          {name: err.name, code: err.statusCode, message: err.message};
+      winston.error(error);
+    }
 
-  winston.info('Search by text complete.');
-  return {photos, parameters, error};
+    winston.info('Search by text complete.');
+    return {photos, parameters, error};
 }
 
 // Returns a list of all albums owner by the logged in user from the Library
