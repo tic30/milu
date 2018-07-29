@@ -521,8 +521,6 @@ app.post(
             console.log(publicURLs);
 
             res.render('pages/picture_v2', {
-                //imgurl: "https://storage.googleapis.com/milu-resources/1532416499328_House_sparrow04.jpg",
-                //para: "bird"
                 urlsAndTexts: publicURLs
             });
         });
@@ -534,8 +532,9 @@ function getPublicUrl (filename) {
     return `https://storage.googleapis.com/${CLOUD_BUCKET}/${filename}`;
 }
 
-function processFiles(files, callback) {
+async function processFiles(files, callback) {
     var publicURLs = {};
+    var counter = 0;
 
     files.forEach(function (fileName, index) {
         const gcsname = Date.now() + '_' + fileName.originalname;
@@ -555,66 +554,74 @@ function processFiles(files, callback) {
         stream.on('finish', () => {
             file.makePublic().then(() => {
                 var url = getPublicUrl(gcsname);
-                //console.log(getPublicUrl(url));
+                console.log(url);
+                //publicURLs[url] = labelText + ',' + extractText ;
 
-                // 20180709 Rico:
-                // Add Zhanghe's Google Vision API call code
-                // Input:   image url from bucket
-                // Output:  JSON response. Then pass to Rico's DB function
-                // ...
+                detection(url, function (detectionMsg) {
+                    publicURLs[url] = detectionMsg;
+                    counter++;
 
-                // Imports the Google Cloud client library
-                const client = new vision.ImageAnnotatorClient();
-                var extractText = '';
-                var labelText = '';
-                client
-                    .textDetection(url)
-                    .then(results => {
-                        const extractTextResponse = results[0].textAnnotations;
-                        console.log('Text OCR Done');
-                        // detections.forEach(text => console.log(text));
-                        // const fullImgUrl = data.imageUrl;
-                        // FIXME :: googleImgId ?, userId ?
-                        // Rico :: Save to DB
-                        // createPicture(value.id, userId, fullImgUrl, data.imageUrl, detections);
-                        // res.status(200).send(detections);
-                        // res.status(200).send(data.imageUrl);
+                    if (counter === files.length) {
+                        callback(publicURLs);
+                    }
+                });
 
-                        extractText = phaseTextExtractResponseJSON(extractTextResponse);
-                        console.log('in client call, extractText is:' + extractText);
-
-                        // Make Lable Detection call;
-                        client
-                            .labelDetection(url)
-                            .then(results => {
-                                const labelsResponse = results[0].labelAnnotations;
-                                console.log('Label Detection Done');
-
-                                labelText = phaseLabelDetectionResponseJSON(labelsResponse);
-                                console.log("in client call, labelText is:" + labelText);
-
-                                // res.render('pages/picture_v2', {
-                                //     imgurl: data.imageUrl,
-                                //     para: extractText + ',' + labelText
-                                // });
-                                console.log(' extractText + labelText is:' + extractText + ',' + labelText);
-                                publicURLs[url] = extractText + ',' + labelText ;
-
-                                if (index === files.length - 1) {
-                                    callback(publicURLs);
-                                }
-                            })
-                        // FIXME
-                    })
-                    .catch(err => {
-                        console.error('ERROR:', err);
-                    });
 
             });
         });
 
+
         stream.end(fileName.buffer);
+
     });
+}
+
+
+function detection(url, callback) {
+    // 20180709 Rico:
+    // Add Zhanghe's Google Vision API call code
+    // Input:   image url from bucket
+    // Output:  JSON response. Then pass to Rico's DB function
+    // ...
+
+    // Imports the Google Cloud client library
+    const client = new vision.ImageAnnotatorClient();
+    var extractText = '';
+    var labelText = '';
+
+    const request = {
+        "image": {
+            "source": {
+                "imageUri": url
+            }
+        },
+        "features": [
+            {
+                "type": "LABEL_DETECTION"
+            },
+            {
+                "type": "TEXT_DETECTION"
+            }
+        ]
+    };
+
+    client
+        .annotateImage(request)
+        .then(results => {
+            console.log(results);
+            const extractTextResponse = results[0].textAnnotations;
+            extractText = phaseTextExtractResponseJSON(extractTextResponse);
+            const labelsResponse = results[0].labelAnnotations;
+            labelText = phaseLabelDetectionResponseJSON(labelsResponse);
+            var detectionMsg = labelText + ',' + extractText;
+
+            console.log(detectionMsg)
+            callback(detectionMsg);
+
+        })
+        .catch(err => {
+            console.error('ERROR:', err);
+        });
 }
 // [END process]
 
@@ -977,7 +984,7 @@ function phaseTextExtractResponseJSON(ExtractTextResponseJSON) {
     //console.log('extractTextResponse Json is:'+ JSON.stringify(ExtractTextResponseJSON));
     if (ExtractTextResponseJSON === undefined || ExtractTextResponseJSON.length == 0) {
         console.log('ExtractTextResponseJSON = empty');
-        return [];
+        return '';
     }
     if (!ExtractTextResponseJSON) {
         console.log('ExtractTextResponseJSON = null');
@@ -992,7 +999,7 @@ function phaseTextExtractResponseJSON(ExtractTextResponseJSON) {
     };
 
     const text_arr = ExtractTextResponseJSON[0].description.split(/[\s,]+/).map(toLower).filter(Boolean);
-    console.log('text_arr is ' + text_arr.toString());
+    //console.log('text_arr is ' + text_arr.toString());
     return text_arr;
 }
 
@@ -1001,13 +1008,13 @@ function phaseLabelDetectionResponseJSON(LabelDetectionResponseJSON) {
     const THRESHOLD = 0.9;
     var label_arr = '';
     for (var i = 0; i < LabelDetectionResponseJSON.length; i++) {
-        console.log(i + "th score is:" + LabelDetectionResponseJSON[i].score,
-            "description is:" + LabelDetectionResponseJSON[i].description);
+        //console.log(i + "th score is:" + LabelDetectionResponseJSON[i].score,
+         //   "description is:" + LabelDetectionResponseJSON[i].description);
         if (LabelDetectionResponseJSON[i].score >= THRESHOLD) {
             label_arr += LabelDetectionResponseJSON[i].description + ',';
         }
     }
-    console.log("after filter by score, label_arr is:" + label_arr);
+    //console.log("after filter by score, label_arr is:" + label_arr);
     return label_arr;
 }
 
