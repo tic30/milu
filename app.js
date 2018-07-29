@@ -49,9 +49,11 @@ const bucket = gcstorage.bucket(CLOUD_BUCKET);
 const mongoose = require('mongoose');
 
 // 'mongodb://user:pass@host:port/db';
-var mongodbUri = 'mongodb://liangyifan:fan1985FAN@ds249311.mlab.com:49311/ccproject2';
+// var mongodbUri = 'mongodb://liangyifan:fan1985FAN@ds249311.mlab.com:49311/ccproject2';
+// var mongodbUri = 'mongodb://liangyifan:fan1985FAN@ds249311.mlab.com:49311/ccproject2';
 
-mongoose.connect(mongodbUri)
+// mongoose.connect(mongodbUri)
+mongoose.connect('mongodb://localhost/ccproject2')
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => console.log('Could not connect to DB...', err))
 
@@ -333,35 +335,41 @@ app.post('/loadScanAll', async (req, res) => {
         var extractText = '';
         var labelText = '';
 
+        const request = {
+          "image" : {
+            "source" : {
+              "imageUri":value.baseUrl
+            }
+          },
+            "features": [
+                {
+                  "type":"LABEL_DETECTION"
+                },
+                {
+                  "type":"TEXT_DETECTION"
+                }
+            ]
+        };
+        const fullImgUrl = value.baseUrl + `=w${value.mediaMetadata.width}-h${value.mediaMetadata.height}`;
+
         client
-            .textDetection(value.baseUrl)
+            .annotateImage(request)
             .then(results => {
+              console.log("Google VISION API Response:" + results);
                 const extractTextResponse = results[0].textAnnotations;
-                const fullImgUrl = value.baseUrl + `=w${value.mediaMetadata.width}-h${value.mediaMetadata.height}`;
-
                 extractText = phaseTextExtractResponseJSON(extractTextResponse);
+                const labelsResponse = results[0].labelAnnotations;
+                labelText = phaseLabelDetectionResponseJSON(labelsResponse);
+                // var detectionMsg = labelText + ',' + extractText;
+                var detectionMsg = labelText.concat(extractText);
 
-                // Make Label Detection Call;
-                client
-                    .labelDetection(value.baseUrl)
-                    .then(results => {
-                        const labelsResponse = results[0].labelAnnotations;
-                        winston.info('Label Detection Done');
+                console.log(' extractText + labelText is:' + detectionMsg);
 
-                        labelText = phaseLabelDetectionResponseJSON(labelsResponse);
-                        winston.info("in client call, labelText is:" + labelText);
+                // Save JSON to DB;
+                console.log('start to save text to DB');
+                createPicture(value.id, userId, fullImgUrl, value.baseUrl, detectionMsg);
+                console.log('END DB Save!');
 
-                        // res.render('pages/picture_v2', {
-                        //     imgurl: data.imageUrl,
-                        //     para: extractText +','+ labelText
-                        // });
-                        winston.info(' extractText + labelText is:' + extractText + ',' + labelText);
-
-                        // Save JSON to DB
-                        winston.info("start to Save Image and Text Into MongoDB");
-                        createPicture(value.id, userId, fullImgUrl, value.baseUrl, extractText + ',' + labelText);
-                        winston.info("End DB Save!");
-                    })
             })
             .catch(err => {
                 console.error('ERROR:', err);
@@ -394,10 +402,13 @@ app.post('/loadFind', async (req, res) => {
     // 1. Get list of imageId based on username and text
     winston.debug(req.user.profile)
     var array_googleImageId = await getPicturesByUsernameAndText(userId, input_search_text);
-    winston.debug(array_googleImageId);
+    console.log("userId is:" + userId);
+    console.log("input_search_text is:" + input_search_text);
+    console.log("array_googleImageId is:"+array_googleImageId);
 
     // 2. Get by array of imageId from step 2
     const data = await libraryApiGet(authToken, parameters, array_googleImageId);
+    console.log("data is:" + data);
 
     // Return and cache the result and parameters.
     returnPhotos(res, userId, data, parameters);
@@ -613,7 +624,8 @@ function detection(url, callback) {
             extractText = phaseTextExtractResponseJSON(extractTextResponse);
             const labelsResponse = results[0].labelAnnotations;
             labelText = phaseLabelDetectionResponseJSON(labelsResponse);
-            var detectionMsg = labelText + ',' + extractText;
+            // var detectionMsg = labelText + ',' + extractText;
+            var detectionMsg = labelText.concat(extractText);
 
             console.log(detectionMsg)
             callback(detectionMsg);
@@ -963,7 +975,7 @@ async function getPicturesByUsername(username) {
 async function getPicturesByUsernameAndText(username, text) {
     console.log('getPicturesByUsernameAndText(username, text)::');
     const pics = await Picture.find( { username: username, texts: text.toLowerCase() } )
-    // console.log(pics);
+    console.log('search pics is:'+pics);
     var array_googleImageId = pics.map(a => a.idInGooglePhoto);
     return array_googleImageId;
 }
@@ -999,22 +1011,22 @@ function phaseTextExtractResponseJSON(ExtractTextResponseJSON) {
     };
 
     const text_arr = ExtractTextResponseJSON[0].description.split(/[\s,]+/).map(toLower).filter(Boolean);
-    //console.log('text_arr is ' + text_arr.toString());
+    console.log('text_arr is ' + text_arr.toString());
     return text_arr;
 }
 
 function phaseLabelDetectionResponseJSON(LabelDetectionResponseJSON) {
     //console.log('labelDetectionJSON is:' + JSON.stringify(LabelDetectionResponseJSON));
     const THRESHOLD = 0.9;
-    var label_arr = '';
+    var label_arr = [];
     for (var i = 0; i < LabelDetectionResponseJSON.length; i++) {
-        //console.log(i + "th score is:" + LabelDetectionResponseJSON[i].score,
-         //   "description is:" + LabelDetectionResponseJSON[i].description);
+        console.log(i + "th score is:" + LabelDetectionResponseJSON[i].score,
+           "description is:" + LabelDetectionResponseJSON[i].description);
         if (LabelDetectionResponseJSON[i].score >= THRESHOLD) {
-            label_arr += LabelDetectionResponseJSON[i].description + ',';
+            label_arr.push( LabelDetectionResponseJSON[i].description);
         }
     }
-    //console.log("after filter by score, label_arr is:" + label_arr);
+    console.log("after filter by score, label_arr is:" + label_arr.toString());
     return label_arr;
 }
 
