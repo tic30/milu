@@ -404,11 +404,11 @@ app.post('/loadFind', async (req, res) => {
     var array_googleImageId = await getPicturesByUsernameAndText(userId, input_search_text);
     console.log("userId is:" + userId);
     console.log("input_search_text is:" + input_search_text);
-    console.log("array_googleImageId is:"+array_googleImageId);
+    console.log("array_googleImageId is:", array_googleImageId);
 
     // 2. Get by array of imageId from step 2
     const data = await libraryApiGet(authToken, parameters, array_googleImageId);
-    console.log("data is:" + data);
+    console.log("data is:", JSON.stringify(data));
 
     // Return and cache the result and parameters.
     returnPhotos(res, userId, data, parameters);
@@ -790,7 +790,7 @@ async function libraryApiGet(authToken, parameters, arr_img_id) {
 
     try {
       let index = 0
-      do {
+      while (photos.length < arr_img_id.length){
         winston.info(`Submitting get with parameters: ${JSON.stringify(parameters)}`);
         const result =
             await request.get(config.apiEndpoint + '/v1/mediaItems/'+ arr_img_id[index], {
@@ -800,6 +800,7 @@ async function libraryApiGet(authToken, parameters, arr_img_id) {
         
         let items = [JSON.parse(result)];
         photos = photos.concat(items);
+        index++
 
         // Set the pageToken for the next request.
         parameters.pageToken = result.nextPageToken;
@@ -810,8 +811,7 @@ async function libraryApiGet(authToken, parameters, arr_img_id) {
 
         // Loop until the required number of photos has been loaded or until there
         // are no more photos, ie. there is no pageToken.
-      } while (photos.length < config.photosToLoad &&
-              parameters.pageToken != null);
+      }
 
     } catch (err) {
       // If the error is a StatusCodeError, it contains an error.error object that
